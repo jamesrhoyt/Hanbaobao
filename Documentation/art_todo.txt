@@ -1,0 +1,45 @@
+Art To-do List:
+---------------
+
+New Formation Box
+-New color (White metal?)
+-Green/Yellow LEDs toward corners indicating movement direction.
+- (?) Short track to indicate box movement pattern.
+
+Turret
+-Expand the bars on the Turret's grate, to prevent them from flickering as the camera moves.
+
+Explosions
+-Player ship (when taking basic damage)
+-More unique Player deaths for certain Boss attacks (e.g. Disintegration via laser).
+-Bullet "plink" (when hitting wall/immune Enemy)
+-Generic Enemy explosion
+
+New Twitch Plane
+
+Player Ship
+(X) -Top View of Ship to use as Barrel Roll keyframe
+(X) -Botton view of ship to use as Barrel Roll keyframe
+-In-between frames to fill out the Barrel Roll animation
+	-Two frames between each keyframe, for 12 frames total (4 Keyframes + 8 In-Betweens).  
+
+Player Shield
+-A blue or purple energy shield that surrounds the entirety of the Player ship (in its default position).
+-Shape: either elliptical or skewed toward the back, like a comet.
+-Animation for acquiring the Shield, and for its destruction.
+
+New Enemy: "Track Turret" [Working Title]
+-Small Enemy with potential "aiming" animation.
+-Large track (possibly figure-8, like the Formbox).
+-Multiple of them move in a train, fire at corners (like Formbox).
+
+New Enemy: "Dive Bomber"
+-Small plane/aircraft begins in top right corner.
+-Purpose is to "dive bomb" player by getting a few shots (3-4) fired
+ before flying past player and away on left side of field.
+
+(X) Spike Ball
+-Potentially a weaponized version to be fired from a boss? (2 attached via chain)
+
+Lightning "Spark" Bullet
+- A flickering "spark" that the Lightning Wall Nodes fire when their partner Nodes are destroyed.

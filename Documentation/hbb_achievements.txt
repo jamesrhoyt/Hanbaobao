@@ -1,0 +1,14 @@
+Hanbaobao Achievements
+----------------------
+
+One-Track Mind: 	Destroy the Core without damaging any of its weapons.
+(?) Sharpshooter:	Clear a Stage with 100+% Accuracy.
+Hail Hydra: 		Destroy the Hydra without getting hit (even with a Shield).
+Eggs in One Basket:	Upgrade a Weapon to Level 4.
+There Can Be Only One:	Destroy the Mirror Mk. II without losing a Life.
+High Score:		Enter a Score on the High Scores List.
+Top Score:		Enter a Rank 1 Score on the High Scores List.
+Game Clear:		Beat Stage 5.
+1CC:			Beat Stages 1 through 5 without using a Continue.
+(Secret) Cheat Codes:	Enter a Cheat Code via the Sound Test.
+(Secret) Game Clear EX:	Beat Stage 7.

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2c1184a394f25b145b773d46165cb35d
+timeCreated: 1457466376
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - hitbox: {instanceID: 0}
+  - discBullet: {fileID: 168744, guid: 9189acdceadb59045a429d0991d9d74e, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

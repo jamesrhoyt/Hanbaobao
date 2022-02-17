@@ -1,0 +1,14 @@
+Script Resources/Credits
+------------------------
+
+Gradient Effect:
+	-Unity 4.6 Text Gradient: hampst (reddit.com/user/hampst)
+	-Unity 4.6 Text Gradient (Error fix): StarManta (forum.unity3d.com/members/starmanta.1195)
+	-Unity 5.2 Text Gradient: nzgeoff (forum.unity3d.com/members/nzgeoff.649012)
+
+Fade In/Out Effect:
+	-Asbjorn Thirslund (twitter.com/BrackeysTweet)
+
+Enemy "Hit Flash" Effect:
+	-Concept: nyonge (http://answers.unity3d.com/users/181374/nyonge.html)
+	-Code: ericdl (http://answers.unity3d.com/users/330303/ericdl.html)

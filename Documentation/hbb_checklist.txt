@@ -1,0 +1,25 @@
+Hanbaobao Design Document Checklist
+-----------------------------------
+
+(X) I. High Concept
+    II. Introduction
+    III. Art
+    IV. Music
+    V. SFX
+(X) VI. Title Screen
+(X) VII. Game Controls
+(X) VIII. Options
+(X) IX. Main Game Display
+(X) X. Camera Movement
+(X) XI. Player
+    XII. Weapons
+    XIII. Enemies
+(X) XIV. Items
+    XV. Mini-Bosses
+    XVI. Stage Bosses
+    XVII. Game Progression
+    XVIII. Scoring
+(X) XIX. Stage Clear
+(X) XX. Game Over
+    XXI. Ending
+    XXII. Credits

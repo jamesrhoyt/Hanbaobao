@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 2ec388e40d563984ea923e76b155addd
+timeCreated: 1487817513
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: CollegiateHeavyOutline
+  fontNames:
+  - CollegiateHeavyOutline
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,175 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &115208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 409316}
+  - component: {fileID: 11425336}
+  - component: {fileID: 11458926}
+  - component: {fileID: 5346250235164340292}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &409316
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115208}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &11425336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54e4f91af74b30a448be4ce78e7887a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputs: {fileID: 0}
+  action_up:
+    m_Name: Action_up
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: cd2dd901-7f6a-4777-8826-415b424fc2f9
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+  action_down:
+    m_Name: Action_down
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 95df0a0d-3402-4a9e-925f-34a939dccfb6
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+  action_left:
+    m_Name: Action_left
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 842b4a09-c4a7-4909-8c18-c9d8e4754c91
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+  action_right:
+    m_Name: Action_right
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: cc75efcc-57ee-4f15-8590-746369ef353f
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+  action_A:
+    m_Name: Action_A
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 7ecf1da2-8e38-4c82-8feb-75f5f1de82d4
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+  action_B:
+    m_Name: Action_B
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a731ab39-3a4e-48c8-9186-85b4fce66b93
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+  action_C:
+    m_Name: Action_C
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 2760d3cd-08c5-4995-868b-94feac2b842b
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+  action_Start:
+    m_Name: Action_Start
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 88d270d3-4322-47d6-bcc9-12d5b3180000
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+  lives: 3
+  startingLives: 3
+  continues: 2
+  bombs: 3
+  score: 0
+  buttonConfig: 1
+  weaponLevels: 010000000100000001000000010000000100000001000000
+  weaponIndex: 0
+  introBackground: {fileID: 0}
+  subtitleBackground: {fileID: 0}
+  startText: {fileID: 0}
+  optionsText: {fileID: 0}
+  menuCursor: {fileID: 0}
+  titleLogo: {fileID: 0}
+  cheat_infiniteLivesEnabled: 0
+  cheat_infiniteContinuesEnabled: 0
+  cheat_infiniteBombsEnabled: 0
+  achievementsEnabled: 0
+--- !u!114 &11458926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a925258784dc5eb46bc7df514bfba3c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadeOutOverlay: {fileID: 2800000, guid: fbf981904161e7e48aa1dcedd0875968, type: 3}
+  fadeSpeed: 1.8
+--- !u!114 &5346250235164340292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: db0ecfcea5cfc2740b7a5f2d9ed0a4b3,
+    type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Default
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
