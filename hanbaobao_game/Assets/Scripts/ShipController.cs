@@ -13,7 +13,6 @@ public class ShipController : Movable2
 {
     // Use this for initialization
 
-    private bool buttonPressed;     //Whether a directional button has been pressed this frame.
     public GameObject playerBullet; //The currently equipped Weapon projectile prefab.
     private Vector2 direction;      //The values to apply to the Ship X- and Y-direction (-1, 0, or 1).
     private float baseSpeed;        //The basic speed value for the Player's ship.
@@ -80,7 +79,6 @@ public class ShipController : Movable2
 
     protected override void Start()
     {
-        buttonPressed = true;
         barrelRolling = false;
         direction = new Vector2(0, 0);
         baseSpeed = 0.35f;
@@ -186,7 +184,6 @@ public class ShipController : Movable2
                     }
                     //Change the Player's velocity.
                     direction.y = 1;
-                    buttonPressed = true;
                 }
             }
             //Reset the "Up" Timer if the key isn't being held.
@@ -245,7 +242,6 @@ public class ShipController : Movable2
                     //{
                     //    xNew += baseSpeed * Time.deltaTime * 2.5f * (1f / speedModifier);
                     //}
-                    buttonPressed = true;
                 }
             }
             //Reset the "Down" Timer if the key isn't being held.
@@ -279,7 +275,6 @@ public class ShipController : Movable2
             {
                 //Change the Player's velocity.
                 direction.x = -1;
-                buttonPressed = true;
                 //Change the Ship's Flame Animation to account for the movement direction.
                 UpdateFlames(speedSetting - 1);
             }
@@ -296,7 +291,6 @@ public class ShipController : Movable2
             {
                 //Change the Player's velocity.
                 direction.x = 1;
-                buttonPressed = true;
                 //Change the Ship's Flame Animation to account for the movement direction.
                 UpdateFlames(speedSetting + 1);
             }
@@ -377,6 +371,8 @@ public class ShipController : Movable2
         yield return new WaitForEndOfFrame();
         //Activate the Ship's "afterburner" trail.
         //jetFlames.GetComponent<TrailRenderer>().enabled = true;
+        //If the Player is currently Barrel Rolling, wait until they stop.
+        yield return new WaitUntil(() => !barrelRolling);
         //Send the Ship quickly past the right edge of the screen.
         SetAngleInDegrees(0);
         SetSpeed(exitingSpeed);
@@ -431,10 +427,6 @@ public class ShipController : Movable2
         }
         //Zero out the Ship's speed in case "speedDecay" surpassed "baseSpeed".
         SetSpeed(0);
-        //Wait for the Boss to finish its intro Animation before starting the fight.
-        /*yield return new WaitForSeconds(3);
-        LevelManager.instance.inCutscene = false;
-        StartCoroutine(LevelManager.instance.BossFight());*/
     }
 
     //Set the Player's ship moving directly up (dir=1) or directly down (dir=-1).
@@ -749,8 +741,8 @@ public class ShipController : Movable2
         //This check will occur constantly throughout gameplay.
         while (true)
         {
-            //Only take Player input if the Player is alive, and the Game isn't paused.
-            if (isAlive && !LevelManager.instance.gamePaused)
+            //Only take Player input if the Player is alive and their controls are enabled, and the Game isn't paused.
+            if (isAlive && controlsEnabled && !LevelManager.instance.gamePaused)
             {
                 //If the "A Button" is pressed, change the Ship's speed.
                 if (LevelManager.instance.action_A.triggered) { SpeedChange(); }
@@ -771,8 +763,8 @@ public class ShipController : Movable2
         //This check will occur constantly throughout gameplay.
         while (true)
         {
-            //Only take Player input if the Player is alive, and the Game isn't paused.
-            if (isAlive && !LevelManager.instance.gamePaused)
+            //Only take Player input if the Player is alive and their controls are enabled, and the Game isn't paused.
+            if (isAlive && controlsEnabled && !LevelManager.instance.gamePaused)
             {
                 //If the "A Button" is pressed, change the Ship's speed.
                 if (LevelManager.instance.action_A.triggered) { SpeedChange(); }
@@ -793,8 +785,8 @@ public class ShipController : Movable2
         //This check will occur constantly throughout gameplay.
         while (true)
         {
-            //Only take Player input if the Player is alive, and the Game isn't paused.
-            if (isAlive && !LevelManager.instance.gamePaused)
+            //Only take Player input if the Player is alive and their controls are enabled, and the Game isn't paused.
+            if (isAlive && controlsEnabled && !LevelManager.instance.gamePaused)
             {
                 //If the "A Button" is held down, try to fire a projectile.
                 if (LevelManager.instance.action_A.ReadValue<float>() > 0) { Shoot(); }
@@ -815,8 +807,8 @@ public class ShipController : Movable2
         //This check will occur constantly throughout gameplay.
         while (true)
         {
-            //Only take Player input if the Player is alive, and the Game isn't paused.
-            if (isAlive && !LevelManager.instance.gamePaused)
+            //Only take Player input if the Player is alive and their controls are enabled, and the Game isn't paused.
+            if (isAlive && controlsEnabled && !LevelManager.instance.gamePaused)
             {
                 //If the "A Button" is held down, try to fire a projectile.
                 if (LevelManager.instance.action_A.ReadValue<float>() > 0) { Shoot(); }
@@ -837,8 +829,8 @@ public class ShipController : Movable2
         //This check will occur constantly throughout gameplay.
         while (true)
         {
-            //Only take Player input if the Player is alive, and the Game isn't paused.
-            if (isAlive && !LevelManager.instance.gamePaused)
+            //Only take Player input if the Player is alive and their controls are enabled, and the Game isn't paused.
+            if (isAlive && controlsEnabled && !LevelManager.instance.gamePaused)
             {
                 //If the "A Button" is pressed, try to use a Bomb.
                 if (LevelManager.instance.action_A.triggered) { UseBomb(); }
@@ -859,8 +851,8 @@ public class ShipController : Movable2
         //This check will occur constantly throughout gameplay.
         while (true)
         {
-            //Only take Player input if the Player is alive, and the Game isn't paused.
-            if (isAlive && !LevelManager.instance.gamePaused)
+            //Only take Player input if the Player is alive and their controls are enabled, and the Game isn't paused.
+            if (isAlive && controlsEnabled && !LevelManager.instance.gamePaused)
             {
                 //If the "A Button" is pressed, try to use a Bomb.
                 if (LevelManager.instance.action_A.triggered) { UseBomb(); }
@@ -884,9 +876,11 @@ public class ShipController : Movable2
         firingLightning = false;
         LevelManager.instance.ClearLightning();
         //Make the Player's Sprite invisible.
-        this.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
+        GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
         jetFlames.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
         hitboxLight.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
+        //Set the Player's speed to 0 (to prevent the Ship from moving while dead, due to "Update"'s logic.
+        SetSpeed(0);
         //Toggle the flag for the "No Miss" bonus in LevelManager.
         LevelManager.instance.lifeUsed = true;
         //Wait 3 seconds (respawn time) before deciding what to do next.
@@ -957,7 +951,7 @@ public class ShipController : Movable2
         //Make the Player immune to damage.
         isInvincible = true;
         //Make the Player's Sprite semi-transparent.
-        this.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
+        GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
         jetFlames.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
         hitboxLight.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
         //Give the Player five seconds of invincibility.
@@ -974,7 +968,7 @@ public class ShipController : Movable2
             yield return new WaitForSeconds(Time.deltaTime);
         }
         //Make the Player's Sprite fully opaque.
-        this.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+        GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
         jetFlames.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
         hitboxLight.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
         //Make the Player susceptible to damage again.
@@ -1019,14 +1013,14 @@ public class ShipController : Movable2
             //Weapon 0: The Base Gun
             case 0:
                 //Weapon Level 1: Create the 1st Bullet directly in front of the Player.
-                bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                 bullet.GetComponent<Bullet>().SetAngleInDegrees(0);
                 bullet.GetComponent<Bullet>().SetSpeed(bulletSpeed_baseGun);
                 //Weapon Level 2: Create a 2nd Bullet .05 above the Player.
                 if (weaponLevels[0] >= 2)
                 {
                     //Create a 2nd Bullet copy, and add it to LevelManager's list here directly.
-                    GameObject bullet2 = Instantiate(playerBullet, transform.position + new Vector3(0, .05f, 1f), Quaternion.identity) as GameObject;
+                    GameObject bullet2 = Instantiate(playerBullet, transform.position + new Vector3(0, .05f, 1f), Quaternion.identity);
                     bullet2.GetComponent<Bullet>().SetAngleInDegrees(0);
                     bullet2.GetComponent<Bullet>().SetSpeed(bulletSpeed_baseGun);
                     LevelManager.instance.AddBulletToList(bullet2);
@@ -1036,7 +1030,7 @@ public class ShipController : Movable2
                     if (weaponLevels[0] >= 3)
                     {
                         //Create a 3rd Bullet copy, and add it to LevelManager's list here directly.
-                        GameObject bullet3 = Instantiate(playerBullet, transform.position + new Vector3(0, -.05f, 1f), Quaternion.identity) as GameObject;
+                        GameObject bullet3 = Instantiate(playerBullet, transform.position + new Vector3(0, -.05f, 1f), Quaternion.identity);
                         bullet3.GetComponent<Bullet>().SetAngleInDegrees(0);
                         bullet3.GetComponent<Bullet>().SetSpeed(bulletSpeed_baseGun);
                         LevelManager.instance.AddBulletToList(bullet3);
@@ -1048,7 +1042,7 @@ public class ShipController : Movable2
                 return bullet;
             //Weapon 1: The Pierce Laser
             case 1:
-                bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                 //Set the Laser moving to the right at a decent speed.
                 bullet.GetComponent<Bullet>().SetAngleInDegrees(0);
                 bullet.GetComponent<Bullet>().SetSpeed(bulletSpeed_pierceLaser);
@@ -1061,25 +1055,25 @@ public class ShipController : Movable2
                 {
                     //Weapon Level 1: Create a slow-moving (and by extension, short-range) copy of the Boomerang.
                     case 1:
-                        bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                        bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                         bullet.GetComponent<Bullet>().SetAngleInDegrees(0);
                         bullet.GetComponent<Bullet>().SetSpeed(bulletSpeed_boomerang1);
                         return bullet;
                     //Weapon Level 2: Create a moderate-moving (and by extension, mid-range) copy of the Boomerang.
                     case 2:
-                        bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                        bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                         bullet.GetComponent<Bullet>().SetAngleInDegrees(0);
                         bullet.GetComponent<Bullet>().SetSpeed(bulletSpeed_boomerang2);
                         return bullet;
                     //Weapon Level 3: Create a fast-moving (and by extension, long-range) copy of the Boomerang.
                     case 3:
-                        bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                        bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                         bullet.GetComponent<Bullet>().SetAngleInDegrees(0);
                         bullet.GetComponent<Bullet>().SetSpeed(bulletSpeed_boomerang3);
                         return bullet;
                     //Default Weapon Level (shouldn't be reached):
                     default:
-                        bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                        bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                         bullet.GetComponent<Bullet>().SetAngleInDegrees(0);
                         bullet.GetComponent<Bullet>().SetSpeed(bulletSpeed_boomerang1);
                         return bullet;
@@ -1090,7 +1084,7 @@ public class ShipController : Movable2
                 //Weapon Level 1: Create a bolt of Lightning that, when first fired, will hone in on the closest Enemy.
                 playerBullet.GetComponent<Bullet>().SetTarget(transform.position);
                 playerBullet.GetComponent<Bullet>().SetSpeed(5f);
-                bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                bullet = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                 //Weapon Level 1: Create 1 Arc that can attack any Enemy.
                 if (weaponLevels[4] == 1)
                 {
@@ -1100,7 +1094,7 @@ public class ShipController : Movable2
                 else if (weaponLevels[4] == 2)
                 {
                     bullet.GetComponent<Lightning>().SetDirection(-1);
-                    GameObject bullet2 = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                    GameObject bullet2 = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                     bullet2.GetComponent<Lightning>().SetDirection(1);
                     LevelManager.instance.AddBulletToList(bullet2);
                     LevelManager.instance.shotsFired++;
@@ -1109,11 +1103,11 @@ public class ShipController : Movable2
                 else if (weaponLevels[4] == 3)
                 {
                     bullet.GetComponent<Lightning>().SetDirection(0);
-                    GameObject bullet2 = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                    GameObject bullet2 = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                     bullet2.GetComponent<Lightning>().SetDirection(1);
                     LevelManager.instance.AddBulletToList(bullet2);
                     LevelManager.instance.shotsFired++;
-                    GameObject bullet3 = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                    GameObject bullet3 = Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
                     bullet3.GetComponent<Lightning>().SetDirection(-1);
                     LevelManager.instance.AddBulletToList(bullet3);
                     LevelManager.instance.shotsFired++;
@@ -1125,7 +1119,7 @@ public class ShipController : Movable2
             default:
                 playerBullet.GetComponent<Bullet>().SetAngleInDegrees(0);
                 playerBullet.GetComponent<Bullet>().SetSpeed(3f);
-                return Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                return Instantiate(playerBullet, transform.position + Vector3.forward, Quaternion.identity);
         }
     }
 }
