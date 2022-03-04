@@ -39,12 +39,24 @@ public class Core : Boss
     /// Run the introductory animation for the Boss as it enters the Stage, in whatever form that animation takes.
     /// For the Core, simply change the color value of the Core's Sprites from black to white gradually.
     /// </summary>
-    /// <returns></returns>
     public override IEnumerator BossIntroAnimation()
     {
         yield return new WaitForEndOfFrame();
         //Let LevelManager know that the Boss Introduction is complete.
         bossIntroComplete = true;
+    }
+
+    /// <summary>
+    /// Run the death animation for the Boss when its HP reaches 0, in whatever form that animation takes.
+    /// For the Core, [TBD].
+    /// </summary>
+    public override IEnumerator BossDeathAnimation()
+    {
+        yield return new WaitForEndOfFrame();
+        //Simply wait 4 seconds (As a Placeholder)
+        yield return new WaitForSeconds(4);
+        //Let LevelManager know that the Boss Death Animation is complete.
+        bossDeathComplete = true;
     }
 
     /// <summary>
@@ -109,7 +121,7 @@ public class Core : Boss
     //Determine what percentage of HP the Core has left, and update its Sprite if necessary.
     private void CalculateDamage()
     {
-        float hpRatio = hp / startingHP;
+        float hpRatio = (float)hp / startingHP;
         //If hp is greater then 80%, make the Core blue.
         if (hpRatio <= 1f && hpRatio > .8f)
         {
@@ -174,7 +186,7 @@ public class Core : Boss
                 {
                     coreRenderer.color = new Color(coreRenderer.color.r - .125f, coreRenderer.color.g - .125f, coreRenderer.color.b - .125f);
                 }
-                yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime * 6);
             }
             //Fade the coreRenderer's base color from black back to white.
             while (coreRenderer.color != Color.white)
@@ -184,7 +196,7 @@ public class Core : Boss
                 {
                     coreRenderer.color = new Color(coreRenderer.color.r + .125f, coreRenderer.color.g + .125f, coreRenderer.color.b + .125f);
                 }
-                yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime * 6);
             }
         }
     }

@@ -27,14 +27,24 @@ public class Factory : Boss
 
     /// <summary>
     /// Run the introductory animation for the Boss as it enters the Stage, in whatever form that animation takes.
-    /// For the Factory, 
+    /// For the Factory, [TBD].
     /// </summary>
-    /// <returns></returns>
     public override IEnumerator BossIntroAnimation()
     {
         yield return new WaitForEndOfFrame();
         //Let LevelManager know that the Boss Introduction is complete.
         bossIntroComplete = true;
+    }
+
+    /// <summary>
+    /// Run the death animation for the Boss when its HP reaches 0, in whatever form that animation takes.
+    /// For the Factory, [TBD].
+    /// </summary>
+    public override IEnumerator BossDeathAnimation()
+    {
+        yield return new WaitForEndOfFrame();
+        //Let LevelManager know that the Boss Death Animation is complete.
+        bossDeathComplete = true;
     }
 
     /// <summary>

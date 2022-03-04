@@ -13,21 +13,28 @@ public abstract class Boss : Movable2
 {
     public int hp;  //The total Hit Points for the Boss.
     public bool bossIntroComplete;  //Whether the introductory animation for the Boss is complete.
+    public bool bossDeathComplete;  //Whether the death animation for the Boss is complete.
 
-	// Use this for initialization
-	protected override void Start()
+    // Use this for initialization
+    protected override void Start()
     {
         //Call Movable2's Start.
         base.Start();
         //Set "bossIntroComplete" to false.
         bossIntroComplete = false;
-	}
+        //Set "bossDeathComplete" to false.
+        bossDeathComplete = false;
+    }
 
     /// <summary>
     /// Run the introductory animation for the Boss as it enters the Stage, in whatever form that animation takes.
     /// </summary>
-    /// <returns></returns>
     public abstract IEnumerator BossIntroAnimation();
+
+    /// <summary>
+    /// Run the death animation for the Boss when its HP reaches 0, in whatever form that animation takes.
+    /// </summary>
+    public abstract IEnumerator BossDeathAnimation();
 
     /// <summary>
     /// Check every Collider2D component in a Boss against the Collider in the argument.
