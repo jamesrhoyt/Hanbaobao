@@ -375,7 +375,7 @@ MonoBehaviour:
   hitbox: {fileID: 61416442062452746}
   jetFlames: {fileID: 1304633737774906}
   hitboxLight: {fileID: 1494030860955896}
-  barrelRollClip: {fileID: 0}
+  barrelRollClip: {fileID: 7400000, guid: 2cceebd66655210438c4a56db505a86c, type: 2}
   screenEdges: {fileID: 0}
   weapons:
   - {fileID: 1966115708441146, guid: 9e8e9caf263e4e54f9c18054348cfb57, type: 3}

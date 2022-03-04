@@ -15,6 +15,9 @@ using UnityEngine;
 public class Mirror : Miniboss
 {
     public Collider2D hitbox;       //The collision hitbox for the Mirror.
+    //The values to use for the Mirror's RGB components during its intro.
+    private float[] rgbValues = {52f/255f, 116f/255f, 144f/255f, 206f/255f, 1f};
+    private int currentRGBValue;    //The index of the "rgbValues" value currently being used.
 
     //Child GameObjects:
     public GameObject jetFlames;    //The object that displays the Mirror's "flames" Animation.
@@ -28,21 +31,24 @@ public class Mirror : Miniboss
     private float movementStateTimer;       //How much time has elapsed during a Movement State.
     private float movementActiveDuration;   //The amount of time (in seconds) for the Mirror to be moving.
     private float movementIdleDuration;     //The amount of time (in seconds) for the Mirror to be stationary.
-    private bool verticallyBlocked; //Whether there is a Bullet directly above or below the Mirror, obstructing its vertical movement.
     private List<Vector2> bulletPositions;  //The x- and y-positions of each of the Player-fired Bullets on screen.
     private float vertDistToPlayer; //The vertical distance between the Mirror and the Player; used for changing the Mirror's speed.
     private int bulletsAbove;       //The number of Player-fired Bullets directly in front of and slightly above the Mirror.
     private int bulletsBelow;       //The number of Player-fired Bullets directly in front of and slightly below the Mirror.
-    
+
     //"Barrel Roll" Variables:
-    private bool barrelRolling;     //Whether the Mirror is currently in the middle of a Barrel Roll.
-    private float barrelRollMaxSpeedBoost;  //The initial amount of extra speed applied to the Mirror during a Barrel Roll.
-    private float barrelRollCurrentSpeedBoost;  //The amount of speed applied to the Mirror during a Barrel Roll, which starts at "Max" and decays until it reaches 0.
+    private int nearbyBulletsThreshold; //The number of Bullets that have to be close to the Mirror for it to Barrel Roll.
+    private float bulletDistanceMaximumX;   //The maximum horizontal distance at which a Player Bullet can be considered "too close".
+    private float bulletDistanceMaximumY;   //The maximum vertical distance at which a Player Bullet can be considered "too close".
+    private Vector2 savedDirection;     //The direction in which the Mirror was travelling when it started Barrel Rolling.
+    private int savedSpeedInt;          //The speed setting at which the Mirror was travelling when it started Barrel Rolling.
+    private bool barrelRolling;         //Whether the Mirror is currently in the middle of a Barrel Roll.
+    private float barrelRollMaxSpeedBoost;          //The initial amount of extra speed applied to the Mirror during a Barrel Roll.
+    private float barrelRollCurrentSpeedBoost;      //The amount of speed applied to the Mirror during a Barrel Roll, which starts at "Max" and decays until it reaches 0.
     private float barrelRollSpeedBoostDecayFactor;  //The amount to scale "CurrentSpeedBoost" by, to create an asymptotic speed burst.
-    private float barrelRollTimer;  //How much time has elapsed during a Barrel Roll.
+    private float barrelRollTimer;      //How much time has elapsed during a Barrel Roll.
     private float barrelRollDuration;   //The length (in seconds) of the Barrel Roll Animation Clip.
     public AnimationClip barrelRollClip;    //The Animation clip for the Upward Barrel Roll, to calculate "barrelRollDuration" with.
-    private AnimationClip[] clips;  //The Animation clips used in the Barrel Roll, to calculate "barrelRollDuration" with.
 
     //Screen Bounds Variables:
     private bool clampPosition;     //Whether the Mirror's position should be clamped to the screen.
@@ -55,10 +61,14 @@ public class Mirror : Miniboss
     //"Weapons" Variables:
     public GameObject[] weapons;    //Prefab instances of each of the Mirror's possible weapons.
     private int weaponIndex;        //The index of the current Weapon that the Mirror has equipped.
+    private int bulletsFired;       //The number of consecutively-fired Bullets in a "salvo".
+    private int bulletsFiredMaximum;//The maximum number of Bullets the Mirror can fire in a row.
 
     //"Cooldown" Variables:
     private float rateOfFire;       //The time that needs to elapse before another Bullet can be fired.
     private float cooldownTimer;    //The amount of time that has elapsed since the last Bullet fired.
+    private float overheatDuration; //The amount of time to wait after the Mirror has stopped firing* before it can fire again.
+                                    //*Due to it firing too many Bullets or the Player leaving its range.
     private bool inCooldown;        //Whether enough time has elapsed before the Mirror can fire again.
     private float weaponChangeCooldownTimer;    //The time that has elapsed since the Mirror switched weapons.
     private bool inWeaponChangeCooldown;        //Whether enough time has elapsed before the Mirror can switch weapons again.
@@ -88,33 +98,39 @@ public class Mirror : Miniboss
         barrelRollMaxSpeedBoost = 1.8f;
         barrelRollSpeedBoostDecayFactor = 0.96f;
         SpeedChange(2);
-        clips = GetComponent<Animator>().runtimeAnimatorController.animationClips;
+        savedSpeedInt = 2;
         direction = new Vector2(0, 0);
+        savedDirection = new Vector2(0, 0);
         movementStateTimer = 0f;
         movementActiveDuration = 0.5f;
         movementIdleDuration = 0.5f;
-        verticallyBlocked = false;
         bulletPositions = new List<Vector2>();
         vertDistToPlayer = 0;
+        nearbyBulletsThreshold = 3;
+        bulletDistanceMaximumX = 40f;
+        bulletDistanceMaximumY = 20f;
         bulletsAbove = 0;
         bulletsBelow = 0;
         //Set the variables used to keep the Mirror on-screen.
         clampPosition = false;
         halfWidth = GetComponent<SpriteRenderer>().bounds.extents.x;
         halfHeight = GetComponent<SpriteRenderer>().bounds.extents.y;
+        //Set the Mirror's Object colors to black, to fade them in as its intro.
+        GetComponent<SpriteRenderer>().color = Color.black;
+        jetFlames.GetComponent<SpriteRenderer>().color = Color.black;
+        hitboxLight.GetComponent<SpriteRenderer>().color = Color.black;
+        currentRGBValue = 0;
         //Set the "Alive"/"Invincible" values.
         isAlive = true;
         deathTimer = 0;
-        isInvincible = false;
+        isInvincible = true;
         invincibilityTimer = 0;
         //Set the Mirror's Weapon.
         ChangeWeapon(0);
-        //Have the Mirror start moving.
-        StartCoroutine(MovementLogic());
-        //Enable the Mirror's shooting logic.
-        StartCoroutine(ShootingLogic());
-        //Enable the Mirror's weapon changing logic.
-        StartCoroutine(WeaponChangingLogic());
+        bulletsFired = 0;
+        bulletsFiredMaximum = 10;
+        //Start the Mirror's introductory animation.
+        StartCoroutine(IntroAnimation());
     }
 
     //Check the Mirror's collider for collision with a Wall.
@@ -173,183 +189,272 @@ public class Mirror : Miniboss
         }
     }
 
-    //Handle the underlying logic for all of the Mirror's basic movement, using a number of external factors.
-    IEnumerator MovementLogic()
+    //Handle the introductory sequence for the Mirror Miniboss.
+    IEnumerator IntroAnimation()
     {
         //Send the Mirror quickly into frame.
         yield return new WaitForEndOfFrame();
         SpeedChange(4);
         SetAngleInDegrees(180f);
-        yield return new WaitForSeconds(.5f);
+        //Allow this initial movement to be paused if the game is paused.
+        while (movementStateTimer < .2f)
+        {
+            //If the Game is paused, don't increase this timer.
+            if (!LevelManager.instance.gamePaused)
+            {
+                movementStateTimer += Time.deltaTime;
+            }
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
         //Stop the Mirror on the right edge of the screen.
-        SpeedChange(1);
+        SpeedChange(0);
         SetTarget(transform.position);
         //Start clamping the Mirror's position to within the screen boundaries.
         clampPosition = true;
-        //Run the rest of the Movement Logic while the Mirror is alive.
-        while (hp > 0)
+        //Wait two seconds before revealing the Mirror.
+        movementStateTimer = 0;
+        while (movementStateTimer < 2f)
         {
-            //Only update the Mirror's A.I. while both it and the Player are alive.
-            if (isAlive && LevelManager.instance.player.GetComponent<ShipController>().isAlive)
+            //If the Game is paused, don't increase this timer.
+            if (!LevelManager.instance.gamePaused)
             {
-                //Update the Bullet positions.
-                GetBulletPositions();
-
-                #region Changing Speed
-                //Get the vertical distance between the Player and the Mirror.
-                vertDistToPlayer = Mathf.Abs(LevelManager.instance.player.transform.position.y - transform.position.y);
-                //Set the Mirror's new speed according to the vertical distance.
-                if (vertDistToPlayer > 120)
-                {
-                    SpeedChange(4);
-                }
-                else if (vertDistToPlayer > 90 && vertDistToPlayer <= 120)
-                {
-                    SpeedChange(3);
-                }
-                else if (vertDistToPlayer > 60 && vertDistToPlayer <= 90)
-                {
-                    SpeedChange(2);
-                }
-                else if (vertDistToPlayer <= 60)
-                {
-                    SpeedChange(1);
-                }
-                #endregion
-
-                #region Vertical Movement
-                //Check if the Player is too far above the Mirror.
-                if (LevelManager.instance.player.transform.position.y > transform.position.y && Mathf.Abs(LevelManager.instance.player.transform.position.y - transform.position.y) > 10)
-                {
-                    verticallyBlocked = false;
-                    foreach (Vector2 b in bulletPositions)
-                    {
-                        //Check if the Mirror would hit a Bullet by moving upward.
-                        if (b.y - transform.position.y < 5 && Mathf.Abs(b.x - transform.position.x) < 20)
-                        {
-                            verticallyBlocked = true;
-                        }
-                    }
-                    //If the Mirror would hit a Bullet, don't move up. Otherwise, do.
-                    direction.y = verticallyBlocked ? 0 : 1;
-                }
-                //Check if the Player is too far below the Mirror.
-                else if (LevelManager.instance.player.transform.position.y < transform.position.y && Mathf.Abs(LevelManager.instance.player.transform.position.y - transform.position.y) > 10)
-                {
-                    verticallyBlocked = false;
-                    foreach (Vector2 b in bulletPositions)
-                    {
-                        //Check if the Mirror would hit a Bullet by moving downward.
-                        if (transform.position.y - b.y < 5 && Mathf.Abs(b.x - transform.position.x) < 20)
-                        {
-                            verticallyBlocked = true;
-                        }
-                    }
-                    //If the Mirror would hit a Bullet, don't move down. Otherwise, do.
-                    direction.y = verticallyBlocked ? 0 : -1;
-                }
-                //If the Mirror is within range, stop moving it vertically.
-                else
-                {
-                    direction.y = 0;
-                }
-                #endregion
-
-                #region Horizontal Movement
-                //If the Mirror is too far, horizontally, from the Player, move it left.
-                if (transform.position.x - LevelManager.instance.player.transform.position.x > 180f)
-                {
-                    direction.x = -1;
-                }
-                //Otherwise, if the Mirror is too close to the Mirror, move it right.
-                else if (transform.position.x - LevelManager.instance.player.transform.position.x < 90f)
-                {
-                    direction.x = 1;
-                }
-                //If the Mirror is in just the right relative position, don't move it horizontally.
-                else
-                {
-                    direction.x = 0;
-                }
-                #endregion
-
-                #region Barrel Rolling
-                //Reset the bullet counters.
-                bulletsAbove = 0;
-                bulletsBelow = 0;
-                foreach (Vector2 b in bulletPositions)
-                {
-                    //Check if a Bullet is directly in front of the Mirror.
-                    if (transform.position.x - b.x > 0 && transform.position.x - b.x < 40)
-                    {
-                        //If the Bullet is slightly above the Mirror, move the Mirror backward and increase the counter.
-                        if (b.y > transform.position.y && Mathf.Abs(b.y - transform.position.y) < 20)
-                        {
-                            direction.x = 1;
-                            bulletsAbove++;
-                        }
-                        //If the Bullet is slightly below the Mirror, move the Mirror backward and increase that counter.
-                        else if (b.y < transform.position.y && Mathf.Abs(b.y - transform.position.y) < 20)
-                        {
-                            direction.x = 1;
-                            bulletsBelow++;
-                        }
-                    }
-                }
-                //If there are at least 5 Bullets approaching above the Mirror (and fewer below), barrel roll downward.
-                if (bulletsAbove > 5 && bulletsAbove > bulletsBelow && !barrelRolling)
-                {
-                    StartCoroutine(BarrelRoll(-1));
-                }
-                //If there are at least 5 Bullets approaching below the Mirror, barrel roll upward.
-                else if (bulletsBelow > 5 && !barrelRolling)
-                {
-                    StartCoroutine(BarrelRoll(1));
-                }
-                #endregion
-
-                #region Update Visuals
-                //Only update the Sprite and the Flames if the Mirror isn't Barrel Rolling.
-                if (!barrelRolling)
-                {
-                    //Update the Sprite based on the Vertical Direction of the Mirror.
-                    switch (direction.y)
-                    {
-                        case -1:
-                            GetComponent<SpriteRenderer>().sprite = spriteTiltedDown;
-                            break;
-                        case 0:
-                            GetComponent<SpriteRenderer>().sprite = spriteNeutral;
-                            break;
-                        case 1:
-                            GetComponent<SpriteRenderer>().sprite = spriteTiltedUp;
-                            break;
-                    }
-                    //Update the Sprite based on the Horizontal Direction of the Mirror.
-                    switch (direction.x)
-                    {
-                        case -1:
-                            UpdateFlames(speedSetting + 1);
-                            break;
-                        case 0:
-                            UpdateFlames(speedSetting);
-                            break;
-                        case 1:
-                            UpdateFlames(speedSetting - 1);
-                            break;
-                    }
-                }
-                #endregion
-
-                //Change the Mirror's direction using the results of the above logic.
-                SetTarget((Vector2)transform.position + direction);
-            }
-            //Otherwise, stop in place.
-            else
-            {
-                SetSpeed(0);
+                movementStateTimer += Time.deltaTime;
             }
             yield return new WaitForSeconds(Time.deltaTime);
+        }
+        //Reveal the Mirror gradually, every half-second.
+        while (currentRGBValue < rgbValues.Length)
+        {
+            //Set the Color for each of the Sprite Renderers, using the next RGB value in line.
+            GetComponent<SpriteRenderer>().color = new Color(rgbValues[currentRGBValue], rgbValues[currentRGBValue], rgbValues[currentRGBValue]);
+            jetFlames.GetComponent<SpriteRenderer>().color = new Color(rgbValues[currentRGBValue], rgbValues[currentRGBValue], rgbValues[currentRGBValue]);
+            hitboxLight.GetComponent<SpriteRenderer>().color = new Color(rgbValues[currentRGBValue], rgbValues[currentRGBValue], rgbValues[currentRGBValue]);
+            //Increment "currentRGBvalue" for the next loop.
+            currentRGBValue++;
+            //Reset the timer.
+            movementStateTimer = 0;
+            //Wait a quarter-second before increasing the color values again.
+            while (movementStateTimer < .25f)
+            {
+                //If the Game is paused, don't increase this timer.
+                if (!LevelManager.instance.gamePaused)
+                {
+                    movementStateTimer += Time.deltaTime;
+                }
+                yield return new WaitForSeconds(Time.deltaTime);
+            }
+        }
+        //Reset the timer.
+        movementStateTimer = 0;
+        //Wait 3 more seconds before starting the fight.
+        while (movementStateTimer < 1f)
+        {
+            //If the Game is paused, don't increase this timer.
+            if (!LevelManager.instance.gamePaused)
+            {
+                movementStateTimer += Time.deltaTime;
+            }
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        //Disable the Mirror's starting invincibility.
+        isInvincible = false;
+        //Set the Mirror's speed.
+        SpeedChange(2);
+        //Start the Mirror's Coroutines.
+        //Have the Mirror start moving.
+        StartCoroutine(MovementLogic());
+        //Enable the Mirror's shooting logic.
+        StartCoroutine(ShootingLogic());
+        //Enable the Mirror's weapon changing logic.
+        StartCoroutine(WeaponChangingLogic());
+    }
+
+    //Handle the underlying logic for all of the Mirror's basic movement, using a number of external factors.
+    IEnumerator MovementLogic()
+    {
+        //Yield out of this Coroutine to let the other ones start.
+        yield return new WaitForEndOfFrame();
+        //Run the Movement Logic while the Mirror is alive.
+        while (hp > 0)
+        {
+            //Determine the Mirror's horizontal movement direction for this cycle.
+            #region Horizontal Movement
+            //If the Mirror is too far, horizontally, from the Player, move it left.
+            if (transform.position.x - LevelManager.instance.player.transform.position.x > 180f)
+            {
+                direction.x = -1;
+            }
+            //Otherwise, if the Mirror is too close to the Mirror, move it right.
+            else if (transform.position.x - LevelManager.instance.player.transform.position.x < 90f)
+            {
+                direction.x = 1;
+            }
+            //If the Mirror is in just the right relative position, don't move it horizontally.
+            else
+            {
+                direction.x = 0;
+            }
+            #endregion
+
+            //Determine the Mirror's vertical movement direction for this cycle.
+            #region Vertical Movement
+            //If the Mirror is too far above the Player, move it down.
+            if (transform.position.y - LevelManager.instance.player.transform.position.y > 15f)
+            {
+                direction.y = -1;
+            }
+            //Otherwise, if the Mirror is too far below the Player, move it up.
+            else if (transform.position.y - LevelManager.instance.player.transform.position.y < 15f)
+            {
+                direction.y = 1;
+            }
+            //If the Mirror is in just the right relative position, don't move it vertically.
+            else
+            {
+                direction.y = 0;
+            }
+            #endregion
+
+            //Determine the speed at which the Mirror should move this cycle.
+            /*#region Setting Speed
+            //Get the vertical distance between the Player and the Mirror.
+            vertDistToPlayer = Mathf.Abs(LevelManager.instance.player.transform.position.y - transform.position.y);
+            //Set the Mirror's new speed according to the vertical distance.
+            if (vertDistToPlayer > 120)
+            {
+                SpeedChange(4);
+            }
+            else if (vertDistToPlayer > 90 && vertDistToPlayer <= 120)
+            {
+                SpeedChange(3);
+            }
+            else if (vertDistToPlayer > 60 && vertDistToPlayer <= 90)
+            {
+                SpeedChange(2);
+            }
+            else if (vertDistToPlayer <= 60)
+            {
+                SpeedChange(1);
+            }
+            #endregion*/
+
+            //Change the Mirror's direction using the results of the above logic.
+            SetTarget((Vector2)transform.position + direction);
+            SpeedChange(2);
+            //Save these values, in case they need to be reimplemented after a Barrel Roll.
+            savedDirection = direction;
+            savedSpeedInt = 2;
+            //Let the Mirror travel at this direction and speed for its "Active" duration (barring interruptions).
+            //Reset the timer.
+            movementStateTimer = 0;
+            while (movementStateTimer < movementActiveDuration)
+            {
+                //Only run this loop while the Mirror is alive, and the game isn't paused.
+                if (isAlive && !LevelManager.instance.gamePaused)
+                {
+                    //If the Mirror is Barrel Rolling, don't increase the timer for this movement state.
+                    if (!barrelRolling)
+                    {
+                        movementStateTimer += Time.deltaTime;
+                    }
+
+                    //Determine whether the Mirror needs to do a Barrel Roll during this state.
+                    #region Barrel Rolling
+                    //Update the Bullet positions.
+                    GetBulletPositions();
+                    //Reset the bullet counters.
+                    bulletsAbove = 0;
+                    bulletsBelow = 0;
+                    foreach (Vector2 b in bulletPositions)
+                    {
+                        //Check if a Bullet is directly in front of the Mirror.
+                        if (transform.position.x - b.x > 0 && transform.position.x - b.x < bulletDistanceMaximumX)
+                        {
+                            //If the Bullet is slightly above the Mirror, increase the "above" counter.
+                            if (b.y > transform.position.y && Mathf.Abs(b.y - transform.position.y) < bulletDistanceMaximumY)
+                            {
+                                bulletsAbove++;
+                            }
+                            //If the Bullet is slightly below the Mirror, increase the "below" counter.
+                            else if (b.y < transform.position.y && Mathf.Abs(b.y - transform.position.y) < bulletDistanceMaximumY)
+                            {
+                                bulletsBelow++;
+                            }
+                        }
+                    }
+                    //If there are at least 3 Bullets approaching above the Mirror (and fewer below), barrel roll downward.
+                    if (bulletsAbove >= nearbyBulletsThreshold && bulletsAbove > bulletsBelow && !barrelRolling)
+                    {
+                        StartCoroutine(BarrelRoll(-1));
+                    }
+                    //If there are at least 3 Bullets approaching below the Mirror, barrel roll upward.
+                    else if (bulletsBelow >= nearbyBulletsThreshold && !barrelRolling)
+                    {
+                        StartCoroutine(BarrelRoll(1));
+                    }
+                    #endregion
+                }
+                yield return new WaitForSeconds(Time.deltaTime);
+            }
+            //Stop the Mirror in place for its "Idle" duration (barring interruptions).
+            SpeedChange(0);
+            SetTarget((Vector2)transform.position);
+            //Save these values, in case they need to be reimplemented after a Barrel Roll.
+            savedDirection.x = 0;
+            savedDirection.y = 0;
+            savedSpeedInt = 0;
+            //Reset the timer.
+            movementStateTimer = 0;
+            while (movementStateTimer < movementIdleDuration)
+            {
+                //Only run this timer while the game isn't paused.
+                if (!LevelManager.instance.gamePaused)
+                {
+                    movementStateTimer += Time.deltaTime;
+
+                    //Determine whether the Mirror needs to do a Barrel Roll during this state.
+                    #region Barrel Rolling
+                    //Update the Bullet positions.
+                    GetBulletPositions();
+                    //Reset the bullet counters.
+                    bulletsAbove = 0;
+                    bulletsBelow = 0;
+                    foreach (Vector2 b in bulletPositions)
+                    {
+                        //Check if a Bullet is directly in front of the Mirror.
+                        if (transform.position.x - b.x > 0 && transform.position.x - b.x < bulletDistanceMaximumX)
+                        {
+                            //If the Bullet is slightly above the Mirror, increase the "above" counter.
+                            if (b.y > transform.position.y && Mathf.Abs(b.y - transform.position.y) < bulletDistanceMaximumY)
+                            {
+                                bulletsAbove++;
+                            }
+                            //If the Bullet is slightly below the Mirror, increase the "below" counter.
+                            else if (b.y < transform.position.y && Mathf.Abs(b.y - transform.position.y) < bulletDistanceMaximumY)
+                            {
+                                bulletsBelow++;
+                            }
+                        }
+                    }
+                    //If there are at least 3 Bullets approaching above the Mirror (and fewer below), barrel roll downward.
+                    if (bulletsAbove >= nearbyBulletsThreshold && bulletsAbove > bulletsBelow && !barrelRolling)
+                    {
+                        StartCoroutine(BarrelRoll(-1));
+                    }
+                    //If there are at least 3 Bullets approaching below the Mirror, barrel roll upward.
+                    else if (bulletsBelow >= nearbyBulletsThreshold && !barrelRolling)
+                    {
+                        StartCoroutine(BarrelRoll(1));
+                    }
+                    #endregion
+                }
+                yield return new WaitForSeconds(Time.deltaTime);
+            }
+            //Don't start the "Active" duration again until the Mirror has finished Barrel Rolling, if it is doing so.
+            while(barrelRolling)
+            {
+                yield return new WaitForSeconds(Time.deltaTime);
+            }
         }
     }
 
@@ -424,8 +529,8 @@ public class Mirror : Miniboss
         }
         barrelRolling = false;
         GetComponent<Animator>().enabled = false;
-        SetTarget(transform.position);
-        SetSpeed(0);
+        SetTarget((Vector2)transform.position + savedDirection);
+        SpeedChange(savedSpeedInt);
     }
 
     /// <summary>
@@ -543,31 +648,47 @@ public class Mirror : Miniboss
         //Keep this loop running as long as the Mirror has lives left.
         while (hp > 0)
         {
-            //Check that the Player is within vertical range of the Mirror, and is in front of it.
-            if (Mathf.Abs(LevelManager.instance.player.transform.position.y) - Mathf.Abs(transform.position.y) < (halfHeight * 2) && LevelManager.instance.player.transform.position.x < transform.position.x)
+            //Check that the Player is within vertical range of the Mirror, both the Player
+            //and Mirror are alive, and the Mirror has not fired too many Bullets in a row.
+            if (Mathf.Abs(LevelManager.instance.player.transform.position.y) - Mathf.Abs(transform.position.y) < (halfHeight * 2)
+                && LevelManager.instance.player.GetComponent<ShipController>().isAlive && isAlive
+                && bulletsFired <= bulletsFiredMaximum)
             {
-                //Check that the Player is currently alive.
-                if (LevelManager.instance.player.GetComponent<ShipController>().isAlive)
+                //Check that the Mirror's weapon is not in "cooldown" mode.
+                if (!inCooldown)
                 {
-                    //See if the Mirror can currently shoot.
-                    Shoot();
+                    //Put the Mirror's weapon in "cooldown" mode.
+                    inCooldown = true;
+                    //Fire the Mirror's weapon, then track its "rate-of-fire" timer.
+                    StartCoroutine(FiringCooldown());
                 }
+            }
+            //If any of those are false, have the Mirror wait some length of time before resuming firing.
+            else
+            {
+                //Disable the Mirror's weapon temporarily by putting it in "cooldown" mode.
+                inCooldown = true;
+                //The more Bullets the Mirror fired consecutively, the longer the "overheat" should be.
+                overheatDuration = bulletsFired * .15f;
+                //Reset the number of Bullets fired for the next time.
+                bulletsFired = 0;
+                //Reset the Cooldown Timer.
+                cooldownTimer = 0f;
+                //Start the Cooldown Timer.
+                while (cooldownTimer < overheatDuration)
+                {
+                    //If the Game is paused, pause the Cooldown Timer.
+                    if (!LevelManager.instance.gamePaused)
+                    {
+                        cooldownTimer += Time.deltaTime;
+                    }
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
+                //Take the Mirror's Weapon out of "cooldown" mode when the timer expires.
+                inCooldown = false;
             }
             //Yield to allow the rest of the Game to run.
             yield return new WaitForSeconds(Time.deltaTime);
-        }
-    }
-
-    //Fire a projectile when the Mirror's weapon is not in cooldown.
-    private void Shoot()
-    {
-        //Check that the Mirror's weapon is not in "cooldown" mode.
-        if (!inCooldown && isAlive)
-        {
-            //Put the Mirror's weapon in "cooldown" mode.
-            inCooldown = true;
-            //Fire the Mirror's weapon, then track its "rate-of-fire" timer.
-            StartCoroutine(FiringCooldown());
         }
     }
 
@@ -576,6 +697,8 @@ public class Mirror : Miniboss
     {
         //Add a newly-created instance of the Mirror's Bullet to the LevelManager's list, to use in LevelManager's collision checks.
         LevelManager.instance.AddBulletToList(CreateBullet());
+        //Increment the "Bullets Fired" counter, to prevent the Mirror from firing too many Bullets consecutively.
+        bulletsFired++;
         //Wait for a brief period of time before letting the Mirror fire another Bullet.
         //Reset the Cooldown Timer.
         cooldownTimer = 0f;
@@ -634,6 +757,8 @@ public class Mirror : Miniboss
         TakeDamage(1);
         //Set the Mirror to "dead" (so it doesn't perform any actions before respawning).
         isAlive = false;
+        //Zero out the Mirror's speed (to prevent it from moving while dead).
+        SetSpeed(0);
         //Make the Mirror's Sprite invisible.
         GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
         jetFlames.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0f);
@@ -666,6 +791,8 @@ public class Mirror : Miniboss
     {
         //Make the Mirror immune to damage.
         isInvincible = true;
+        //Restore the speed from before the Mirror died.
+        SpeedChange(savedSpeedInt);
         //Make the Mirror's Sprite semi-transparent.
         GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
         jetFlames.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, .5f);
