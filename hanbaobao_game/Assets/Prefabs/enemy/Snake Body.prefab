@@ -140,4 +140,4 @@ MonoBehaviour:
   dmgImmune: 1
   hitbox: {fileID: 5840232}
   item: {fileID: 0}
-  explosion: {fileID: 0}
+  explosion: {fileID: 1040789066457050, guid: 43287719e9c6069489e515d9efd18630, type: 3}

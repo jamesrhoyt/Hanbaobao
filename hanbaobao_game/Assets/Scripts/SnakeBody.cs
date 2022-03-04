@@ -7,8 +7,6 @@
  */
 
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class SnakeBody : EnemyController
 {
@@ -30,6 +28,17 @@ public class SnakeBody : EnemyController
         nextTarget = Vector3.zero;
         movementCycles = 0;
 	}
+
+    //Despawn the SnakeBody when it passes outside of the screen.
+    void OnTriggerExit2D(Collider2D box)
+    {
+        //Check if this is the Collider surrounding the Camera view.
+        if (box.gameObject.CompareTag("ScreenBox"))
+        {
+            //Remove the Body from LevelManager's list of Enemies.
+            LevelManager.instance.RemoveEnemyFromList(gameObject);
+        }
+    }
 
     //Add the next target position for the Body sphere to move towards.
     public void UpdateTarget(Vector3 newTarget)

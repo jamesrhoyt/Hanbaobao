@@ -63,7 +63,7 @@ public class Snake : EnemyController
         for (int i = 0; i < snakeBody.Length; i++)
         {
             //Put each Body object behind the last one on the z-axis, to prevent them from overlapping incorrectly.
-            snakeBody[i] = Instantiate(snakeBodyTemplate, transform.position + new Vector3(0, 0, i + 1), Quaternion.identity) as GameObject;
+            snakeBody[i] = Instantiate(snakeBodyTemplate, transform.position + new Vector3(0, 0, i + 1), Quaternion.identity);
             //Make each part of the Snake's body immune to damage; only the head can be damaged directly.
             snakeBody[i].GetComponent<EnemyController>().dmgImmune = true;
         }
@@ -136,11 +136,6 @@ public class Snake : EnemyController
         {
             //Remove the Head from LevelManager's list of Enemies.
             LevelManager.instance.RemoveEnemyFromList(gameObject);
-            //Remove every part of the Body from LevelManager's list of Enemies.
-            foreach (GameObject g in snakeBody)
-            {
-                LevelManager.instance.RemoveEnemyFromList(g);
-            }
         }
     }
 
@@ -150,7 +145,7 @@ public class Snake : EnemyController
         //Find an angle, and get the x- and y-distance based off of that angle.
         do
         {
-            //Random.InitState(seed);
+            Random.InitState(seed);
             movementAngle = Random.Range(0, 15) * 22.5f;
             //Set the two pythagorean components of the Snake's new movement target (the hypotenuse should always be as long as the Snake itself).
             xDist = Mathf.Cos(movementAngle * Mathf.Deg2Rad) * snakeLength;
@@ -181,7 +176,7 @@ public class Snake : EnemyController
         while (hp > 0)
         {
             //Create an instance of the Bullet that will appear behind the Snake's head (on the z-axis).
-            GameObject bullet = Instantiate(snakeBullet, transform.position + new Vector3(-2f, 0f, 1f), Quaternion.identity) as GameObject;
+            GameObject bullet = Instantiate(snakeBullet, transform.position + new Vector3(-2f, 0f, 1f), Quaternion.identity);
             //Add the Bullet to the LevelManager's list.
             LevelManager.instance.AddBulletToList(bullet);
             //Set the target for the laser directly to the left of the Snake's Head.
