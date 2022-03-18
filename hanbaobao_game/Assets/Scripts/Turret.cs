@@ -118,7 +118,7 @@ public class Turret : EnemyController
             }
             turretBullet.GetComponent<Bullet>().SetSpeed(bulletSpeed);
             //Create an instance of the Bullet that will appear behind the Turret (on the z-axis).
-            GameObject bullet = Instantiate(turretBullet, transform.position + new Vector3(0f, 0f, 1f), Quaternion.identity) as GameObject;
+            GameObject bullet = Instantiate(turretBullet, transform.position + Vector3.forward, Quaternion.identity);
             //Add the Bullet to the LevelManager's list.
             LevelManager.instance.AddBulletToList(bullet);
             //If this is a Rapid-Fire Turret, create two more bullets immediately after the first.
@@ -153,7 +153,7 @@ public class Turret : EnemyController
                     }
                     turretBullet.GetComponent<Bullet>().SetSpeed(bulletSpeed);
                     //Create an instance of the Bullet that will appear behind the Turret (on the z-axis).
-                    bullet = Instantiate(turretBullet, transform.position + new Vector3(0f, 0f, 1f), Quaternion.identity) as GameObject;
+                    bullet = Instantiate(turretBullet, transform.position + Vector3.forward, Quaternion.identity);
                     //Add the Bullet to the LevelManager's list.
                     LevelManager.instance.AddBulletToList(bullet);
                 }

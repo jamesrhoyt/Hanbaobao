@@ -61,10 +61,10 @@ public class EnemyController : Movable2
             //If the Enemy has an Item, drop it where the Enemy died.
             if (item != null && !itemDropped)
             {
-                item = Instantiate(item, transform.position, Quaternion.identity) as GameObject;
+                item = Instantiate(item, transform.position, Quaternion.identity);
                 itemDropped = true;
             }
-            explosion = Instantiate(explosion, transform.position, Quaternion.identity) as GameObject;
+            explosion = Instantiate(explosion, transform.position, Quaternion.identity);
             LevelManager.instance.AddExplosionToList(explosion);
         }
     }

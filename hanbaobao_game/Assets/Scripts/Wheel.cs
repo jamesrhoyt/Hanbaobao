@@ -93,7 +93,7 @@ public class Wheel : EnemyController
             for (int i = 0; i < 4; i++)
             {
                 //Create the new Bullet behind the Wheel on the z-axis, by adding a Vector3 with a 1 in its z-component.
-                GameObject bullet = Instantiate(wheelBullet, transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                GameObject bullet = Instantiate(wheelBullet, transform.position + Vector3.forward, Quaternion.identity);
                 //Add the Bullet to the LevelManager's list.
                 LevelManager.instance.AddBulletToList(bullet);
                 //Set the angle for the Bullet, and set its speed.

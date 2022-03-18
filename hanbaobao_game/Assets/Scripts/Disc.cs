@@ -104,7 +104,7 @@ public class Disc : EnemyController
             //Get the Player's location to use as the firing target.
             bulletTarget = GameObject.FindWithTag("Player").transform.position;
             //Create an instance of the Bullet that will appear in front of the Disc (on the z-axis).
-            GameObject bullet = Instantiate(discBullet, transform.position + new Vector3(0, 0, -1f), Quaternion.identity) as GameObject;
+            GameObject bullet = Instantiate(discBullet, transform.position + Vector3.back, Quaternion.identity);
             //Add the Bullet to the LevelManager's list.
             LevelManager.instance.AddBulletToList(bullet);
             //Assign the Bullet's target and speed.

@@ -84,7 +84,6 @@ public class LevelManager : MonoBehaviour
     private float bossFightTransitionTimer; //A timer to space out the states of the transition into the Boss Fight.
     public GameObject boss;         //The Boss of the Stage.
     public bool inBossFight;        //Whether or not the Player is currently fighting the Boss (used for various conditional statements).
-    public float bossDeathLength;   //The amount of time to wait after the Boss dies before continuing.
 
     //"End Of Stage" Variables:
     public int shotsFired;      //How many times the Player fired a Shot.
@@ -459,7 +458,7 @@ public class LevelManager : MonoBehaviour
         player.GetComponent<ShipController>().controlsEnabled = false;
         //Reset the Boss Fight Transition Timer.
         bossFightTransitionTimer = 0;
-        //Wait 1.5 seconds before starting the next step.
+        //Wait 1.5 seconds before sending the Player offscreen and "scrolling forward" to the Boss Room.
         while (bossFightTransitionTimer < 1.5)
         {
             //If the Game is paused, don't update the Timer.
@@ -507,7 +506,7 @@ public class LevelManager : MonoBehaviour
         BGManager.instance.AdjustScrollOffset(4, -BGManager.instance.scrollValues[4] - BGManager.instance.scrollOffsets[4]);
         //Reset the Boss Fight Transition Timer.
         bossFightTransitionTimer = 0;
-        //Wait another 1.5 seconds before starting the next step.
+        //Wait another 1.5 seconds before sending the Player into the Room.
         while (bossFightTransitionTimer < 1.5)
         {
             //If the Game is paused, don't update the Timer.
@@ -521,7 +520,7 @@ public class LevelManager : MonoBehaviour
         StartCoroutine(player.GetComponent<ShipController>().EnterBossRoom());
         //Reset the Boss Fight Transition Timer.
         bossFightTransitionTimer = 0;
-        //Wait another 1.5 seconds before starting the next step.
+        //Wait another 1.5 seconds before starting the Boss' Intro Animation.
         while (bossFightTransitionTimer < 1.5)
         {
             //If the Game is paused, don't update the Timer.
@@ -537,7 +536,7 @@ public class LevelManager : MonoBehaviour
         yield return new WaitWhile(() => boss.GetComponent<Boss>().bossIntroComplete == false);
         //Reset the Boss Fight Transition Timer.
         bossFightTransitionTimer = 0;
-        //Wait another 3 seconds before starting the next step.
+        //Wait another 3 seconds before starting the Boss Fight proper.
         while (bossFightTransitionTimer < 3)
         {
             //If the Game is paused, don't update the Timer.
@@ -547,7 +546,11 @@ public class LevelManager : MonoBehaviour
             }
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        //
+        //Re-enable the Player's controls.
+        player.GetComponent<ShipController>().controlsEnabled = true;
+        //Start the Boss Fight.
+        StartCoroutine(BossFight());
+
     }
 
     //Manage the Boss Fight progression, and start the "end-of-Stage" proceedings when it dies.
@@ -596,7 +599,8 @@ public class LevelManager : MonoBehaviour
         //Put the game in Cutscene Mode for the end of the Stage.
         inCutscene = true;
         //Let the Boss' death Animation play out.
-        yield return new WaitForSeconds(bossDeathLength);
+        StartCoroutine(boss.GetComponent<Boss>().BossDeathAnimation());
+        yield return new WaitUntil(() => boss.GetComponent<Boss>().bossDeathComplete);
         //Start up the "Stage Clear" Screen.
         StartCoroutine(EndStage());
     }

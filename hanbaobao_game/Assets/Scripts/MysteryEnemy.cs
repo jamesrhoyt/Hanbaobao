@@ -72,7 +72,7 @@ public class MysteryEnemy : EnemyController
         {
             Random.InitState(Time.frameCount);
         }
-        enemyToSpawn = Instantiate(potentialEnemies[Random.Range(0, potentialEnemies.Length)], transform.position, Quaternion.identity) as GameObject;
+        enemyToSpawn = Instantiate(potentialEnemies[Random.Range(0, potentialEnemies.Length)], transform.position, Quaternion.identity);
         enemyToSpawn.GetComponent<EnemyController>().item = gameObject.GetComponent<EnemyController>().item;
     }
 }

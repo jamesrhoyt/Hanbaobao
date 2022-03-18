@@ -96,7 +96,7 @@ public class Fly : EnemyController
         //smoothMove(transform.position.x, transform.position.y, speed);
         SetSpeed(0);
         //Create an instance of the Bullet that will appear behind the Fly (on the z-axis).
-        GameObject bullet = Instantiate(flyBullet, transform.position + new Vector3(0f, 0f, 1f), Quaternion.identity) as GameObject;
+        GameObject bullet = Instantiate(flyBullet, transform.position + Vector3.forward, Quaternion.identity);
         //Add the Bullet to the LevelManager's list.
         LevelManager.instance.AddBulletToList(bullet);
         //Set the target for the laser directly to the left of the Fly.
@@ -129,7 +129,7 @@ public class Fly : EnemyController
             //smoothMove(transform.position.x, transform.position.y, speed);
             SetSpeed(0);
             //Create an instance of the Bullet that will appear behind the Fly (on the z-axis).
-            bullet = Instantiate(flyBullet, transform.position + new Vector3(0f, 0f, 1f), Quaternion.identity) as GameObject;
+            bullet = Instantiate(flyBullet, transform.position + Vector3.forward, Quaternion.identity);
             //Add the Bullet to the LevelManager's list.
             LevelManager.instance.AddBulletToList(bullet);
             //Set the target for the laser directly to the left of the Fly.

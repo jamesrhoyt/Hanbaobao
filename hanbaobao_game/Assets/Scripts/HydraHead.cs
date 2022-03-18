@@ -55,7 +55,7 @@ public class HydraHead : EnemyController
         for (int i = 1; i < hydraSegment.Length; i++)
         {
             //Put each Body object behind the last one on the z-axis, to prevent them from overlapping incorrectly.
-            hydraSegment[i] = Instantiate(hydraNeckTemplate, transform.position + new Vector3(0, 0, i * .02f), Quaternion.identity) as GameObject;
+            hydraSegment[i] = Instantiate(hydraNeckTemplate, transform.position + new Vector3(0, 0, i * .02f), Quaternion.identity);
             //Make each part of the Hydra's neck immune to damage; only the head can be damaged directly.
             hydraSegment[i].GetComponent<EnemyController>().dmgImmune = true;
             //Make each part of the Neck a child of the main Hydra object.
@@ -103,7 +103,7 @@ public class HydraHead : EnemyController
         hydraBullet.GetComponent<Bullet>().SetAngleInDegrees(180f);
         hydraBullet.GetComponent<Bullet>().SetSpeed(.8f);
         //Create an instance of the Bullet that will appear behind the Hydra's head (on the z-axis).
-        GameObject bullet = Instantiate(hydraBullet, transform.position + new Vector3(-0.02f, 0f, 1f), Quaternion.identity) as GameObject;
+        GameObject bullet = Instantiate(hydraBullet, transform.position + new Vector3(-0.02f, 0f, 1f), Quaternion.identity);
         //Add the Bullet to the LevelManager's list.
         LevelManager.instance.AddBulletToList(bullet);
 

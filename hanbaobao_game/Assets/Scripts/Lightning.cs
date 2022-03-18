@@ -106,7 +106,7 @@ public class Lightning : Bullet
             //If there is no object at this index, create one.
             if (segments[i] == null)
             {
-                segments[i] = Instantiate(segmentTemplate, transform.position, Quaternion.identity) as GameObject;
+                segments[i] = Instantiate(segmentTemplate, transform.position, Quaternion.identity);
                 LevelManager.instance.AddBulletToList(segments[i]);
             }
             //Set the position and scale of this segment.

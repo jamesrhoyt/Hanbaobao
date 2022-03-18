@@ -36,8 +36,8 @@ public class FoldWallR : EnemyController
         //Instantiate the Segments list.
         wallSegments = new List<GameObject>();
         //Instantiate the two head segments.
-        redSegmentA = Instantiate(redSegmentTemplate, transform.position - new Vector3(0,0,.1f), transform.rotation) as GameObject;
-        redSegmentB = Instantiate(redSegmentTemplate, transform.position - new Vector3(0,0,.2f), transform.rotation) as GameObject;
+        redSegmentA = Instantiate(redSegmentTemplate, transform.position - new Vector3(0,0,.1f), transform.rotation);
+        redSegmentB = Instantiate(redSegmentTemplate, transform.position - new Vector3(0,0,.2f), transform.rotation);
         //Set the pivot points' starting positions.
         leftPivot = new Vector3(transform.position.x, transform.position.y + hitbox.bounds.extents.y, 2f);
         rightPivot = new Vector3(transform.position.x, transform.position.y - hitbox.bounds.extents.y, 2f);
@@ -145,7 +145,7 @@ public class FoldWallR : EnemyController
                 yield return new WaitForSeconds(Time.deltaTime * 4);
             }
             //Create a new "gold" segment.
-            GameObject newSegment = Instantiate(foldWallSegment, segment.transform.position + Vector3.forward, segment.transform.rotation) as GameObject;
+            GameObject newSegment = Instantiate(foldWallSegment, segment.transform.position + Vector3.forward, segment.transform.rotation);
             //Add the new segment to the list of segments.
             wallSegments.Add(newSegment);
             //Increase the red segment's point value.

@@ -29,7 +29,7 @@ public class Gradient : BaseMeshEffect
     //Create a list of vertices to be colored in ModifyVertices.
     public override void ModifyMesh(VertexHelper vh)
     {
-        if (!this.IsActive())
+        if (!IsActive())
             return;
 
         List<UIVertex> list = new List<UIVertex>();

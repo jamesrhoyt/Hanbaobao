@@ -26,7 +26,7 @@ public class Explosion : MonoBehaviour
     {
         if (GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("explosionEnd"))
         {
-            LevelManager.instance.RemoveExplosionFromList(this.gameObject);
+            LevelManager.instance.RemoveExplosionFromList(gameObject);
         }
 	}
 }

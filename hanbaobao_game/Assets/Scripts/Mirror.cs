@@ -725,25 +725,25 @@ public class Mirror : Miniboss
         {
             //Case 0: Base Gun
             case 0:
-                bullet = Instantiate(weapons[0], transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                bullet = Instantiate(weapons[0], transform.position + Vector3.forward, Quaternion.identity);
                 bullet.GetComponent<Bullet>().SetAngleInDegrees(180f);
                 bullet.GetComponent<Bullet>().SetSpeed(3f);
                 return bullet;
             //Case 1: Boomerang
             case 1:
-                bullet = Instantiate(weapons[1], transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                bullet = Instantiate(weapons[1], transform.position + Vector3.forward, Quaternion.identity);
                 bullet.GetComponent<Bullet>().SetAngleInDegrees(180f);
                 bullet.GetComponent<Bullet>().SetSpeed(1.8f);
                 return bullet;
             //Case 2: Pierce Laser
             case 2:
-                bullet = Instantiate(weapons[2], transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                bullet = Instantiate(weapons[2], transform.position + Vector3.forward, Quaternion.identity);
                 bullet.GetComponent<Bullet>().SetAngleInDegrees(180f);
                 bullet.GetComponent<Bullet>().SetSpeed(4f);
                 return bullet;
             //Default (never reached)
             default:
-                bullet = Instantiate(weapons[0], transform.position + Vector3.forward, Quaternion.identity) as GameObject;
+                bullet = Instantiate(weapons[0], transform.position + Vector3.forward, Quaternion.identity);
                 bullet.GetComponent<Bullet>().SetAngleInDegrees(180f);
                 bullet.GetComponent<Bullet>().SetSpeed(3f);
                 return bullet;

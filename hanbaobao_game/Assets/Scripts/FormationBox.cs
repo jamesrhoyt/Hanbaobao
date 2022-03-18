@@ -117,7 +117,7 @@ public class FormationBox : EnemyController
             //Get the Player's location to use as the firing target.
             shotTarget = GameObject.FindGameObjectWithTag("Player").transform.position;
             //Create an instance of the Bullet that will appear in front of the Box (on the z-axis).
-            GameObject bullet = Instantiate(boxBullet, transform.position + Vector3.back, Quaternion.identity) as GameObject;
+            GameObject bullet = Instantiate(boxBullet, transform.position + Vector3.back, Quaternion.identity);
             //Add the Bullet to the LevelManager's list.
             LevelManager.instance.AddBulletToList(bullet);
             //Assign the Bullet's target and speed.
