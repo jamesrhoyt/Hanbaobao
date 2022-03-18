@@ -47,10 +47,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9588448fb8b9bbf4f9398873256bd711, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageCamera: {fileID: 0}
   screenEdges: {fileID: 0}
   stageNumber: 0
   gamePaused: 0
+  inCutscene: 1
   inputs: {fileID: 0}
   action_up:
     m_Name: Action_up
@@ -60,6 +60,7 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
+    m_Flags: 0
   action_down:
     m_Name: Action_down
     m_Type: 0
@@ -68,6 +69,7 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
+    m_Flags: 0
   action_left:
     m_Name: Action_left
     m_Type: 0
@@ -76,6 +78,7 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
+    m_Flags: 0
   action_right:
     m_Name: Action_right
     m_Type: 0
@@ -84,6 +87,7 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
+    m_Flags: 0
   action_A:
     m_Name: Action_A
     m_Type: 0
@@ -92,6 +96,7 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
+    m_Flags: 0
   action_B:
     m_Name: Action_B
     m_Type: 0
@@ -100,6 +105,7 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
+    m_Flags: 0
   action_C:
     m_Name: Action_C
     m_Type: 0
@@ -108,6 +114,7 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
+    m_Flags: 0
   action_Start:
     m_Name: Action_Start
     m_Type: 0
@@ -116,20 +123,30 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
-  inCutscene: 1
-  stageMusic: {fileID: 0}
+    m_Flags: 0
+  stageMusic: {fileID: 82851848419698690}
   musicTracks: []
+  introTimer: 0
+  player: {fileID: 0}
+  enemyWaves: []
+  waveTimestamps: []
+  minibossWave: 0
+  inStageBSide: 0
+  enemyWavesB: []
+  waveTimestampsB: []
+  bossWave: 0
+  miniboss: {fileID: 0}
+  minibossFightTimeLimit: 0
+  minibossDeathLength: 0
+  bossRoomMidFlag: {fileID: 0}
+  bossRoomEndFlag: {fileID: 0}
+  boss: {fileID: 0}
+  inBossFight: 0
+  bossDeathLength: 0
   shotsFired: 0
   enemiesHit: 0
   enemiesKilled: 0
-  minibossStartFlag: {fileID: 0}
-  minibossEndFlag: {fileID: 0}
-  cameraSpeedB: 0
   lifeUsed: 0
-  player: {fileID: 0}
-  miniboss: {fileID: 0}
-  boss: {fileID: 0}
-  inBossFight: 0
   lives: 3
   continues: 2
   bombs: 3
