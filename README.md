@@ -3,7 +3,7 @@ Hanbaobao
 
 ### Required Programs
 
-Unity Editor (Current Version: 2020.3.31f1): [https://unity.com/download](https://unity.com/download)
+Unity Editor (Current Version: 2020.3.32f1): [https://unity.com/download](https://unity.com/download)
 	
 Microsoft Visual Studio (or equivalent IDE): [https://visualstudio.microsoft.com/downloads/](https://visualstudio.microsoft.com/downloads/)
 	

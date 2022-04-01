@@ -34,6 +34,9 @@ public class FoldWallD : EnemyController
         //Set the Fold Wall's travel direction.
         verticalDirection = transform.lossyScale.y * (1 / Mathf.Abs(transform.lossyScale.y));
         horizontalDirection = transform.lossyScale.x * (1 / Mathf.Abs(transform.lossyScale.x));
+        //Set the flag to despawn the segment template when it leaves the screen.
+        //(This should set it for all of its copies.)
+        foldWallSegment.GetComponent<FoldWallSegment>().destroyOnExit = true;
 	}
 
     //Activate the Fold Wall's behaviors when it appears on screen.

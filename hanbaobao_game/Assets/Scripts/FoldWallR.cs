@@ -8,22 +8,33 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class FoldWallR : EnemyController
 {
 
-    public GameObject foldWallSegment;      //The template for the gold segments that extend the Fold Wall.
-    public GameObject redSegmentTemplate;   //The template to create the two red segments off of.
-    public GameObject redSegmentA;          //The 1st lead segment of the Fold Wall.
-    private Vector3 leftPivot;              //The point to rotate the 1st lead segment around.
-    public GameObject redSegmentB;          //The 2nd lead segment of the Fold Wall.
-    private Vector3 rightPivot;             //The point to rotate the 2nd lead segment around.
+    public GameObject goldSegmentTemplate;  //The template for the gold segments that extend the Fold Wall.
+    public GameObject redSegmentUpper;      //The upper lead segment of the Fold Wall.
+    private Vector3 pivotUpper;             //The point to rotate the upper lead segment around.
+    private List<GameObject> segmentsUpper; //Every gold segment in the upper half of the Fold Wall.
+    public GameObject redSegmentLower;      //The lower lead segment of the Fold Wall.
+    private Vector3 pivotLower;             //The point to rotate the lower lead segment around.
+    private List<GameObject> segmentsLower; //Every gold segment in the lower half of the Fold Wall.
+    private float goldSegmentRadius;        //The y-extents of the hitbox when it is perfectly straight.
+                                            //(Used in calculating the "pivot" points.)
     private float goldRotationDirection;    //The direction to rotate the entire Fold Wall assembly.
-    private List<GameObject> wallSegments;  //Every segment in this instance of the Type-R Fold Wall.
+    private float redRotationDirection;     //The direction to rotate the Upper Red Segment.
+                                            //(The direction to rotate the Lower Red Segment will always be the inverse of this.)
+    private float rotationAmountStep;   //How much to rotate the assembly every step of its movement.
+    private float redRotationStep;      //How much to rotate the "red" segments around their pivots every step.
+    private float redRotationTotal;     //How much each "red" segment has rotated since placing a new "gold" segment.
+    private float redRotationLimit;     //How much to rotate each "red" segment around their pivots before changing their rotation direction.
+    private float rotationDelayTimer;   //How much time has elapsed since the last rotation step.
+    private float rotationDelayDuration;//How much time to wait between rotation steps.
 
-	// Use this for initialization
-	protected override void Start()
+    // Use this for initialization
+    protected override void Start()
     {
         //Call EnemyController's Start.
         base.Start();
@@ -33,18 +44,37 @@ public class FoldWallR : EnemyController
         scoreValue = 0;
         //Set the Fold Wall's spin direction.
         goldRotationDirection = transform.lossyScale.x * (1 / Mathf.Abs(transform.lossyScale.x));
-        //Instantiate the Segments list.
-        wallSegments = new List<GameObject>();
+        redRotationDirection = -goldRotationDirection;
+        //Set the flag to not despawn the segment template when it leaves the screen.
+        //(This should set it for all of its copies.)
+        goldSegmentTemplate.GetComponent<FoldWallSegment>().destroyOnExit = false;
         //Instantiate the two head segments.
-        redSegmentA = Instantiate(redSegmentTemplate, transform.position - new Vector3(0,0,.1f), transform.rotation);
-        redSegmentB = Instantiate(redSegmentTemplate, transform.position - new Vector3(0,0,.2f), transform.rotation);
+        redSegmentUpper = Instantiate(redSegmentUpper, transform.position - Vector3.forward, transform.rotation);
+        redSegmentLower = Instantiate(redSegmentLower, transform.position - Vector3.forward, transform.rotation);
+        //Set the flag to not despawn the head segments when they leave the screen.
+        redSegmentUpper.GetComponent<FoldWallSegment>().destroyOnExit = false;
+        redSegmentLower.GetComponent<FoldWallSegment>().destroyOnExit = false;
+        //Instantiate the Segments lists.
+        segmentsUpper = new List<GameObject>();
+        segmentsLower = new List<GameObject>();
+        //Instantiate the first object in each of the Segments lists.
+        segmentsUpper.Add(Instantiate(goldSegmentTemplate, redSegmentUpper.transform.position, redSegmentUpper.transform.rotation));
+        segmentsLower.Add(Instantiate(goldSegmentTemplate, redSegmentLower.transform.position, redSegmentLower.transform.rotation));
+        //Set the flags to not despawn the gold segments when they leave the screen.
+        //("WaitToDespawn" will handle this.)
+        segmentsUpper.Last().GetComponent<FoldWallSegment>().destroyOnExit = false;
+        segmentsLower.Last().GetComponent<FoldWallSegment>().destroyOnExit = false;
         //Set the pivot points' starting positions.
-        leftPivot = new Vector3(transform.position.x, transform.position.y + hitbox.bounds.extents.y, 2f);
-        rightPivot = new Vector3(transform.position.x, transform.position.y - hitbox.bounds.extents.y, 2f);
-        //Add the 3 starting segments to the list.
-        wallSegments.Add(gameObject);
-        wallSegments.Add(redSegmentA);
-        wallSegments.Add(redSegmentB);
+        goldSegmentRadius = hitbox.bounds.extents.y;
+        pivotUpper = new Vector3(transform.position.x, transform.position.y + hitbox.bounds.extents.y, transform.position.z);
+        pivotLower = new Vector3(transform.position.x, transform.position.y - hitbox.bounds.extents.y, transform.position.z);
+        //Initialize the rotation values.
+        rotationAmountStep = 2.8125f;
+        rotationDelayTimer = 0;
+        rotationDelayDuration = Time.deltaTime * 15f;
+        redRotationStep = 5.625f;
+        redRotationTotal = 0;
+        redRotationLimit = 180f;
 	}
 
     //Activate the Fold Wall's behaviors when it appears on screen.
@@ -54,13 +84,8 @@ public class FoldWallR : EnemyController
         if (box.gameObject.CompareTag("ScreenBox"))
         {
             LevelManager.instance.AddEnemyToList(gameObject);
-            LevelManager.instance.AddEnemyToList(redSegmentA);
-            LevelManager.instance.AddEnemyToList(redSegmentB);
             //Have the Fold Wall start rotating.
-            StartCoroutine(RotateAllSegments());
-            //Have each of the Red Segments start rotating separately.
-            StartCoroutine(RotateRedSegment(redSegmentA, leftPivot, goldRotationDirection));
-            StartCoroutine(RotateRedSegment(redSegmentB, rightPivot, goldRotationDirection));
+            StartCoroutine(RotationLogic());
         }
         //Otherwise, check if this is a Player-controlled Bullet. 
         else if (box.gameObject.CompareTag("PlayerBullet"))
@@ -79,78 +104,137 @@ public class FoldWallR : EnemyController
         //Check if this is the Collider surrounding the Camera view.
         if (box.gameObject.CompareTag("ScreenBox"))
         {
-            LevelManager.instance.RemoveEnemyFromList(gameObject);
+            //LevelManager.instance.RemoveEnemyFromList(gameObject);
+            StartCoroutine(WaitToDespawn(box.bounds.min.x));
         }
     }
 
     //Rotate all of the segments in the Fold Wall.
-    IEnumerator RotateAllSegments()
+    IEnumerator RotationLogic()
     {
         while (hp > 0)
         {
-            foreach (GameObject g in wallSegments)
+            transform.Rotate(Vector3.forward, rotationAmountStep * goldRotationDirection);
+            //Make the entire Fold Wall assembly appear to be rotating around the base segment.
+            //Rotate and revolve all of the Upper Segments.
+            foreach (GameObject g in segmentsUpper)
             {
-                g.transform.RotateAround(transform.position, Vector3.forward, 7.5f * goldRotationDirection);
+                //Revolve all of the gold segments around the base one.
+                g.transform.RotateAround(transform.position, Vector3.forward, rotationAmountStep * goldRotationDirection);
             }
-            leftPivot = new Vector3(redSegmentA.transform.position.x + Mathf.Cos((transform.eulerAngles.z % 360) * Mathf.Deg2Rad),
-                (redSegmentA.transform.position.y + hitbox.bounds.extents.y) + Mathf.Sin((transform.eulerAngles.z % 360) * Mathf.Deg2Rad),
-                2f);
-            rightPivot = new Vector3(redSegmentB.transform.position.x + Mathf.Cos((transform.eulerAngles.z % 360) * Mathf.Deg2Rad),
-                (redSegmentB.transform.position.y - hitbox.bounds.extents.y) + Mathf.Sin((transform.eulerAngles.z % 360) * Mathf.Deg2Rad),
-                2f);
-            transform.RotateAround(transform.position, Vector3.forward, 7.5f);
-            yield return new WaitForSeconds(Time.deltaTime * 4);
+            //Rotate and revolve all of the Lower Segments.
+            foreach (GameObject g in segmentsLower)
+            {
+                //Revolve all of the gold segments around the base one.
+                g.transform.RotateAround(transform.position, Vector3.forward, rotationAmountStep * goldRotationDirection);
+            }
+            //Update the Upper Pivot Point.
+            pivotUpper.Set(segmentsUpper.Last().transform.position.x +
+                (Mathf.Cos((transform.eulerAngles.z + 90f) * Mathf.Deg2Rad) * goldSegmentRadius),
+                segmentsUpper.Last().transform.position.y +
+                (Mathf.Sin((transform.eulerAngles.z + 90f) * Mathf.Deg2Rad) * goldSegmentRadius),
+                transform.position.z);
+            //Update the Lower Pivot Point.
+            pivotLower.Set(segmentsLower.Last().transform.position.x +
+                (Mathf.Cos((transform.eulerAngles.z + 270f) * Mathf.Deg2Rad) * goldSegmentRadius),
+                segmentsLower.Last().transform.position.y +
+                (Mathf.Sin((transform.eulerAngles.z + 270f) * Mathf.Deg2Rad) * goldSegmentRadius),
+                transform.position.z);
+            //Rotate the upper red segment around the base segment, and around its pivot.
+            try
+            {
+                redSegmentUpper.transform.RotateAround(transform.position, Vector3.forward, rotationAmountStep * goldRotationDirection);
+                redSegmentUpper.transform.RotateAround(pivotUpper, Vector3.forward, redRotationStep * redRotationDirection);
+            }
+            catch (MissingReferenceException) { }
+            //Rotate the lower red segment around the base segment, and around its pivot.
+            try
+            {
+                redSegmentLower.transform.RotateAround(transform.position, Vector3.forward, rotationAmountStep * goldRotationDirection);
+                redSegmentLower.transform.RotateAround(pivotLower, Vector3.forward, redRotationStep * -redRotationDirection);
+            }
+            catch (MissingReferenceException) { }
+            //Increase "redRotationTotal" by "redRotationStep".
+            redRotationTotal += redRotationStep;
+            //If the red segments have rotated 180 degrees around their pivots,
+            //create a new gold segment in their place and reverse their pivoting directions.
+            if (redRotationTotal >= redRotationLimit)
+            {
+                //Only do this if the Upper Red Segment hasn't been destroyed.
+                try
+                {
+                    segmentsUpper.Add(Instantiate(goldSegmentTemplate, redSegmentUpper.transform.position + Vector3.forward, redSegmentUpper.transform.rotation));
+                    redSegmentUpper.GetComponent<EnemyController>().scoreValue += 10;
+                    segmentsUpper.Last().GetComponent<FoldWallSegment>().destroyOnExit = false;
+                }
+                catch (MissingReferenceException) { }
+                //Only do this if the Lower Red Segment hasn't been destroyed.
+                try
+                {
+                    segmentsLower.Add(Instantiate(goldSegmentTemplate, redSegmentLower.transform.position + Vector3.forward, redSegmentLower.transform.rotation));
+                    redSegmentLower.GetComponent<EnemyController>().scoreValue += 10;
+                    segmentsLower.Last().GetComponent<FoldWallSegment>().destroyOnExit = false;
+                }
+                catch (MissingReferenceException) { }
+                //Update their pivots to the last segment in each list.
+                pivotUpper.Set(segmentsUpper.Last().transform.position.x + 
+                    (Mathf.Cos((transform.eulerAngles.z + 90f) * Mathf.Deg2Rad) * goldSegmentRadius), 
+                    segmentsUpper.Last().transform.position.y + 
+                    (Mathf.Sin((transform.eulerAngles.z + 90f) * Mathf.Deg2Rad) * goldSegmentRadius),
+                    transform.position.z);
+                pivotLower.Set(segmentsLower.Last().transform.position.x +
+                    (Mathf.Cos((transform.eulerAngles.z + 270f) * Mathf.Deg2Rad) * goldSegmentRadius),
+                    segmentsLower.Last().transform.position.y +
+                    (Mathf.Sin((transform.eulerAngles.z + 270f) * Mathf.Deg2Rad) * goldSegmentRadius),
+                    transform.position.z);
+                //Flip their rotation directions.
+                redRotationDirection *= -1;
+                //Reset the "red" rotation count.
+                redRotationTotal = 0;
+            }
+
+            //Wait 1/4th of a second before incrementing the rotation.
+            //Reset the Delay Timer.
+            rotationDelayTimer = 0;
+            //Run while the timer is less than the allotted duration.
+            while (rotationDelayTimer < rotationDelayDuration)
+            {
+                //If the Game is paused, don't update the Delay Timer.
+                if (!LevelManager.instance.gamePaused)
+                {
+                    rotationDelayTimer += Time.deltaTime;
+                }
+                yield return new WaitForSeconds(Time.deltaTime);
+            }
         }
     }
 
-    /// <summary>
-    /// Rotate the two red segments around their pivot points.
-    /// </summary>
-    /// <param name="segment">The GameObject (red segment) to rotate.</param>
-    /// <param name="pivot">The point "segment" rotates around.</param>
-    /// <param name="verticalDirection">Determines whether "pivot"'s base y-value increases or decreases.</param>
-    /// <returns></returns>
-    IEnumerator RotateRedSegment(GameObject segment, Vector3 pivot, float verticalDirection)
+    //Wait until none of the Fold Wall's Segments can possibly reenter the screen, then despawn all of them.
+    IEnumerator WaitToDespawn(float minX)
     {
-        //Track how much this red segment has rotated since placing a new gold segment.
-        float rotationAmount = 0;
-        //Track the direction to rotate the red segment in.
-        float redRotationDirection = -1; //Make this -1 to start, because the while loop will flip it immediately.
-        //Run this loop while the red segment is still alive.
-        while (segment.GetComponent<EnemyController>().hp > 0)
+        yield return new WaitUntil(() => transform.position.x + (goldSegmentRadius * 2 * Mathf.Max(segmentsUpper.Count(), segmentsLower.Count())) < minX);
+        //Despawn the two red segments (if they haven't died already).
+        try
         {
-            //Flip the red segment's rotation direction.
-            redRotationDirection *= -1;
-            //Update the pivot point.
-            pivot = new Vector3(segment.transform.position.x + Mathf.Cos((segment.transform.eulerAngles.z % 360) * Mathf.Deg2Rad), 
-                segment.transform.position.y + (hitbox.bounds.extents.y * verticalDirection) + Mathf.Sin((segment.transform.eulerAngles.z % 360) * Mathf.Deg2Rad), 
-                2f);
-            //Reset the rotation counter.
-            rotationAmount = 0;
-            //Keep rotating until the segment has turned 180 degrees around its pivot.
-            while (rotationAmount < 180f)
-            {
-                //Only rotate the segment if the game is not paused.
-                if (!LevelManager.instance.gamePaused)
-                {
-                    //Rotate the red segment.
-                    segment.transform.RotateAround(pivot, Vector3.forward, 22.5f * redRotationDirection * verticalDirection);
-                    //Tell the red segment to move to its own position (it will get stuck in place otherwise).
-                    //smoothMove(segment.transform.position.x, segment.transform.position.y, speed);
-                    SetTarget(segment.transform.position);
-                    //Increase the rotation counter.
-                    rotationAmount += 22.5f;
-                }
-                //Pause until the next frame.
-                yield return new WaitForSeconds(Time.deltaTime * 4);
-            }
-            //Create a new "gold" segment.
-            GameObject newSegment = Instantiate(foldWallSegment, segment.transform.position + Vector3.forward, segment.transform.rotation);
-            //Add the new segment to the list of segments.
-            wallSegments.Add(newSegment);
-            //Increase the red segment's point value.
-            segment.GetComponent<EnemyController>().scoreValue += 10;
+            LevelManager.instance.RemoveEnemyFromList(redSegmentUpper);
         }
+        catch (MissingReferenceException) { }
+        try
+        {
+            LevelManager.instance.RemoveEnemyFromList(redSegmentLower);
+        }
+        catch (MissingReferenceException) { }
+        //Despawn all of the created gold segments.
+        foreach (GameObject g in segmentsUpper)
+        {
+            LevelManager.instance.RemoveEnemyFromList(g);
+        }
+        foreach (GameObject g in segmentsLower)
+        {
+            LevelManager.instance.RemoveEnemyFromList(g);
+        }
+        //Despawn the base segment (this object).
+        LevelManager.instance.RemoveEnemyFromList(gameObject);
     }
 
 	// Update is called once per frame

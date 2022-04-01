@@ -11,6 +11,9 @@ using System.Collections;
 
 public class FoldWallSegment : EnemyController
 {
+    public bool onscreen;   //Whether this object is onscreen or not.
+                            //(Used in determining when to despawn the Fold Wall Enemy objects.)
+    public bool destroyOnExit;  //Whether this segment should automatically be destroyed when it leaves the screen.
 
 	// Use this for initialization
 	protected override void Start()
@@ -21,6 +24,8 @@ public class FoldWallSegment : EnemyController
         hp = 1;
         SetSpeed(0f);
         scoreValue = 0;
+        //Initialize the "onscreen" flag.
+        onscreen = false;
 	}
 
     //Add the segment to the list of enemies to check collisions on.
@@ -30,6 +35,7 @@ public class FoldWallSegment : EnemyController
         if (box.gameObject.CompareTag("ScreenBox"))
         {
             LevelManager.instance.AddEnemyToList(gameObject);
+            onscreen = true;
         }
         //Otherwise, check if this is a Player-controlled Bullet. 
         else if (box.gameObject.CompareTag("PlayerBullet"))
@@ -48,7 +54,11 @@ public class FoldWallSegment : EnemyController
         //Check if this is the Collider surrounding the Camera view.
         if (box.gameObject.CompareTag("ScreenBox"))
         {
-            LevelManager.instance.RemoveEnemyFromList(gameObject);
+            if (destroyOnExit)
+            {
+                LevelManager.instance.RemoveEnemyFromList(gameObject);
+            }
+            onscreen = false;
         }
     }
 
