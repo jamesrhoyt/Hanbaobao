@@ -204,6 +204,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -213,8 +214,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -1564,6 +1565,67 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      fontsheet_pressstart_54_Quo: 8470539769871376530
+      fontsheet_pressstart_36_Und: 5060277770575388347
+      fontsheet_pressstart_40_Pou: -904658278654922915
+      fontsheet_pressstart_13_N: -1653139020625185282
+      fontsheet_pressstart_58_Gre: -2868320354453516816
+      fontsheet_pressstart_57_Les: 8852599651522880959
+      fontsheet_pressstart_35_9: 874671914005712454
+      fontsheet_pressstart_7_H: 7838868090577763698
+      fontsheet_pressstart_18_S: 6779298762700812209
+      fontsheet_pressstart_34_8: -5265893930782671988
+      fontsheet_pressstart_20_U: 792301930804799424
+      fontsheet_pressstart_1_B: -6974082842347560201
+      fontsheet_pressstart_43_Car: -519257701340214678
+      fontsheet_pressstart_51_Sem: -5599432686976388359
+      fontsheet_pressstart_16_Q: -2114558032019704225
+      fontsheet_pressstart_6_G: -8808078427017400907
+      fontsheet_pressstart_37_Que: 7054023796311416202
+      fontsheet_pressstart_45_Ast: -3320261704551224857
+      fontsheet_pressstart_11_L: 1635467668380550710
+      fontsheet_pressstart_28_2: 878417796893665569
+      fontsheet_pressstart_17_R: 7988588344444812025
+      fontsheet_pressstart_39_At: 5405777700154901571
+      fontsheet_pressstart_53_Apo: -7030864763020973869
+      fontsheet_pressstart_33_7: -3977681027706962389
+      fontsheet_pressstart_46_LParen: -1658716596422264215
+      fontsheet_pressstart_21_V: 9098282404839391910
+      fontsheet_pressstart_3_D: 8565958011327582523
+      fontsheet_pressstart_49_Min: -5972230570332491225
+      fontsheet_pressstart_47_RParen: -1994117422919904575
+      fontsheet_pressstart_31_5: -94981033724945076
+      fontsheet_pressstart_12_M: 2930620323087570000
+      fontsheet_pressstart_8_I: 7293480981760593432
+      fontsheet_pressstart_14_O: -2485670406930026406
+      fontsheet_pressstart_55_Com: -6001951134861403918
+      fontsheet_pressstart_2_C: 6064891200327316464
+      fontsheet_pressstart_23_X: 2084055196145333192
+      fontsheet_pressstart_26_0: 3168721401993752094
+      fontsheet_pressstart_30_4: -4181839500503378704
+      fontsheet_pressstart_22_W: -4803954809703224353
+      fontsheet_pressstart_25_Z: 4628701594469894115
+      fontsheet_pressstart_38_Exc: -9029282722239015985
+      fontsheet_pressstart_0_A: 6760506255015286296
+      fontsheet_pressstart_56_Dot: -5716204578374214875
+      fontsheet_pressstart_27_1: 4424037741614844754
+      fontsheet_pressstart_15_P: 3612053048954879373
+      fontsheet_pressstart_52_Col: -8215660432569735259
+      fontsheet_pressstart_4_E: 8873765487280117498
+      fontsheet_pressstart_19_T: -2570415828511459869
+      fontsheet_pressstart_32_6: 6445923357791225760
+      fontsheet_pressstart_9_J: -3968936702179547459
+      fontsheet_pressstart_41_Dol: -3574474842390081867
+      fontsheet_pressstart_48_Plu: -4197096998071678984
+      fontsheet_pressstart_42_Per: 7379088829904514489
+      fontsheet_pressstart_59_Til: -517417369134340436
+      fontsheet_pressstart_24_Y: -4323791466640811056
+      fontsheet_pressstart_29_3: 5977055183020702505
+      fontsheet_pressstart_44_Amp: -8898169762734775704
+      fontsheet_pressstart_10_K: -146443369309726100
+      fontsheet_pressstart_50_Equ: -8241823835697942375
+      fontsheet_pressstart_5_F: -6817897709598679487
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

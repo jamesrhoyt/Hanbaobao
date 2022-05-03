@@ -204,6 +204,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -213,8 +214,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -1564,6 +1565,67 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      fontsheet_pressstartlong_L: -2190698944834419214
+      fontsheet_pressstartlong_X: 548381916034900457
+      fontsheet_pressstartlong_R: 3443303295235274899
+      fontsheet_pressstartlong_9: 9103222747969493584
+      fontsheet_pressstartlong_Dol: 2086247561748479775
+      fontsheet_pressstartlong_K: -5091431556519458094
+      fontsheet_pressstartlong_Ast: -5097580360004844909
+      fontsheet_pressstartlong_Y: -28100493692091787
+      fontsheet_pressstartlong_Equ: -971866067992202271
+      fontsheet_pressstartlong_A: -8634897607105400512
+      fontsheet_pressstartlong_3: -5808438330253987079
+      fontsheet_pressstartlong_H: 6866358380753494376
+      fontsheet_pressstartlong_O: 3348228057004424950
+      fontsheet_pressstartlong_LParen: 7085332884979382580
+      fontsheet_pressstartlong_Dot: 525428445125075151
+      fontsheet_pressstartlong_S: 4026793676492128848
+      fontsheet_pressstartlong_Car: 5821873679679211974
+      fontsheet_pressstartlong_6: 3758815069473067801
+      fontsheet_pressstartlong_Z: 7856972267386319351
+      fontsheet_pressstartlong_N: 430615005215557292
+      fontsheet_pressstartlong_I: 4270154320513700283
+      fontsheet_pressstartlong_Til: -3644027255219729623
+      fontsheet_pressstartlong_Pou: 8997598609779765696
+      fontsheet_pressstartlong_1: 7595371574804197282
+      fontsheet_pressstartlong_0: -3124916513497412220
+      fontsheet_pressstartlong_Min: 2260470344864089519
+      fontsheet_pressstartlong_Per: 3142178113321405279
+      fontsheet_pressstartlong_U: 8990827109992436219
+      fontsheet_pressstartlong_Quo: -2468209307456367090
+      fontsheet_pressstartlong_8: 241936561674992488
+      fontsheet_pressstartlong_7: -3010138200022174533
+      fontsheet_pressstartlong_Q: -4048815974125793480
+      fontsheet_pressstartlong_T: -5457723208653639389
+      fontsheet_pressstartlong_V: -8636147485934403766
+      fontsheet_pressstartlong_RParen: -7775218720490236982
+      fontsheet_pressstartlong_E: 1116240031795345252
+      fontsheet_pressstartlong_Les: 653650721909146452
+      fontsheet_pressstartlong_Col: -5664009838473632649
+      fontsheet_pressstartlong_F: 4262127872611470420
+      fontsheet_pressstartlong_Und: -1043404797437485682
+      fontsheet_pressstartlong_Apo: -7767255354725301960
+      fontsheet_pressstartlong_D: -8055900751491837313
+      fontsheet_pressstartlong_Sem: -5245576073537214907
+      fontsheet_pressstartlong_Gre: -3254568726262220621
+      fontsheet_pressstartlong_Que: 2271658808304794510
+      fontsheet_pressstartlong_J: 7258826139475973665
+      fontsheet_pressstartlong_2: -6898064058324725892
+      fontsheet_pressstartlong_M: -899279276425022422
+      fontsheet_pressstartlong_W: 4614586565838041350
+      fontsheet_pressstartlong_G: 5036657044246861146
+      fontsheet_pressstartlong_5: 3647334911507296150
+      fontsheet_pressstartlong_P: -8888081914806532996
+      fontsheet_pressstartlong_Com: -7811225892568838395
+      fontsheet_pressstartlong_At: 7394831440908509946
+      fontsheet_pressstartlong_B: -5854012841816594305
+      fontsheet_pressstartlong_C: -6562598858895291217
+      fontsheet_pressstartlong_4: 4042595934072669339
+      fontsheet_pressstartlong_Amp: -4098791456023692503
+      fontsheet_pressstartlong_Exc: -5788030024599721094
+      fontsheet_pressstartlong_Plu: 6615644135419689247
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

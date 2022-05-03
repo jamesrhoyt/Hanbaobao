@@ -54,6 +54,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -64,7 +65,7 @@ TextureImporter:
     serializedVersion: 2
     filterMode: 0
     aniso: 16
-    mipBias: -100
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -364,6 +365,17 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      title_logo_english_0: 21300000
+      title_logo_english_3: 21300006
+      title_logo_english_8: 21300016
+      title_logo_english_4: 21300008
+      title_logo_english_6: 21300012
+      title_logo_english_9: 21300018
+      title_logo_english_2: 21300004
+      title_logo_english_1: 21300002
+      title_logo_english_7: 21300014
+      title_logo_english_5: 21300010
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

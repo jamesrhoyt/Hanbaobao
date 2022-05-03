@@ -204,6 +204,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -213,8 +214,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -1564,6 +1565,67 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      fontsheet_pressstartitalic_Pou: 6533178341780754691
+      fontsheet_pressstartitalic_L: -8912332069145030501
+      fontsheet_pressstartitalic_S: 3744394891436052152
+      fontsheet_pressstartitalic_Col: 2088054018740523434
+      fontsheet_pressstartitalic_X: 7911873551744322934
+      fontsheet_pressstartitalic_6: -3079692777824449566
+      fontsheet_pressstartitalic_LParen: -6188484597237815063
+      fontsheet_pressstartitalic_Dot: 1561095811268328835
+      fontsheet_pressstartitalic_Ast: 5809769446532650675
+      fontsheet_pressstartitalic_Equ: -5843460439407477861
+      fontsheet_pressstartitalic_P: -4737321936090849281
+      fontsheet_pressstartitalic_0: -4659218168907104224
+      fontsheet_pressstartitalic_V: -3261635788519078706
+      fontsheet_pressstartitalic_1: -6603724258748220150
+      fontsheet_pressstartitalic_8: -6339801484161763831
+      fontsheet_pressstartitalic_Amp: 7194238441229775992
+      fontsheet_pressstartitalic_M: 6460023210368294797
+      fontsheet_pressstartitalic_H: -4184624275215135674
+      fontsheet_pressstartitalic_D: 1523141523077716982
+      fontsheet_pressstartitalic_5: -4423933728776570278
+      fontsheet_pressstartitalic_C: 1377797338377554775
+      fontsheet_pressstartitalic_Y: -6372521933361886251
+      fontsheet_pressstartitalic_K: -4685144180120380126
+      fontsheet_pressstartitalic_F: -3429908898096759333
+      fontsheet_pressstartitalic_N: 7978446114416708754
+      fontsheet_pressstartitalic_Apo: 8401966403861088737
+      fontsheet_pressstartitalic_Exc: 565227149161174162
+      fontsheet_pressstartitalic_B: 5549808961326199494
+      fontsheet_pressstartitalic_Plu: 2793210289397345364
+      fontsheet_pressstartitalic_Com: -7079672700779801634
+      fontsheet_pressstartitalic_Und: 4824350043764702720
+      fontsheet_pressstartitalic_4: -1443596933093963922
+      fontsheet_pressstartitalic_Q: 7059623261921546161
+      fontsheet_pressstartitalic_Dol: -9213691625351022969
+      fontsheet_pressstartitalic_Gre: -1195157523603164038
+      fontsheet_pressstartitalic_Per: 5876787119696142446
+      fontsheet_pressstartitalic_T: 2655517258088533137
+      fontsheet_pressstartitalic_2: -3398770538593945081
+      fontsheet_pressstartitalic_Car: -5520689504970226263
+      fontsheet_pressstartitalic_I: 616754584804684374
+      fontsheet_pressstartitalic_U: 789008183548762259
+      fontsheet_pressstartitalic_Sem: 8345997649864280268
+      fontsheet_pressstartitalic_G: 1074408463642304427
+      fontsheet_pressstartitalic_A: -7156676832202869237
+      fontsheet_pressstartitalic_7: 1959782060517416490
+      fontsheet_pressstartitalic_E: -1932514884940389952
+      fontsheet_pressstartitalic_R: 7446615520215429058
+      fontsheet_pressstartitalic_At: 6602867718492107445
+      fontsheet_pressstartitalic_Quo: 8031362856798863003
+      fontsheet_pressstartitalic_9: -5874202497744194536
+      fontsheet_pressstartitalic_Z: -6227911394497180495
+      fontsheet_pressstartitalic_RParen: -207076784966247823
+      fontsheet_pressstartitalic_O: 3629793968467853264
+      fontsheet_pressstartitalic_Til: 4267102982044239358
+      fontsheet_pressstartitalic_J: -7684270382151904811
+      fontsheet_pressstartitalic_Les: -1046678619705900914
+      fontsheet_pressstartitalic_3: -2814370373474910221
+      fontsheet_pressstartitalic_W: 5437185252173822213
+      fontsheet_pressstartitalic_Que: 6382188865866134120
+      fontsheet_pressstartitalic_Min: -2285061338108565291
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

@@ -75,6 +75,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -84,8 +85,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -532,6 +533,24 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      player_barrelroll_v2_3: 746631258367957417
+      player_barrelroll_v2_7: -9086887587047010515
+      player_barrelroll_v2_15: 6857250139195739977
+      player_barrelroll_v2_4: 6986834499776291568
+      player_barrelroll_v2_12: -2096179924616641792
+      player_barrelroll_v2_6: -2472592427177579829
+      player_barrelroll_v2_11: -6096269685608339024
+      player_barrelroll_v2_1: -1693232962383321582
+      player_barrelroll_v2_0: 1914288011558929713
+      player_barrelroll_v2_8: -7706734939336905684
+      player_barrelroll_v2_16: 4874142782728242523
+      player_barrelroll_v2_13: 5087917215036275702
+      player_barrelroll_v2_5: -4581880638879182705
+      player_barrelroll_v2_9: -6242718694131182741
+      player_barrelroll_v2_2: 6346179805966199807
+      player_barrelroll_v2_10: 817993332001586034
+      player_barrelroll_v2_14: -5101293049401649266
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
