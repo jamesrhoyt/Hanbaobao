@@ -34,16 +34,12 @@ public class Hydra : Miniboss
         //Set any other variables.
         xSpeed = /*Constants.cameraSpeed * .9999f*/-0.045f;
         ySpeed = /*Constants.cameraSpeed * .0001f*/0.011f;
+        SetSpeed(0.015f);
         SetTarget(new Vector2(transform.position.x + xSpeed, transform.position.y + ySpeed));
         startingYPos = transform.position.y;
         headsRemaining = hydraHeads.Length;
         //Initialize the IEnumerator.
         headPhase = HeadPhaseOne();
-	}
-
-    //Start the Hydra's behaviors when it enters the screen.
-    void OnBecameVisible()
-    {
         //Start the Hydra's movement logic.
         StartCoroutine(MovementLogic());
         //Start the Hydra's attacking logic.
@@ -86,6 +82,11 @@ public class Hydra : Miniboss
                         //If not, damage it, damage the Hydra itself, and return.
                         else
                         {
+                            //Damage all of the Neck objects first, in case the Head is destroyed.
+                            foreach (GameObject g in hydraHeads[i].GetComponent<HydraHead>().hydraSegment)
+                            {
+                                g.GetComponent<EnemyController>().TakeDamage(damageValue);
+                            }
                             hydraHeads[i].GetComponent<EnemyController>().TakeDamage(damageValue);
                             StartCoroutine(hydraHeads[i].GetComponent<HydraHead>().DamageCooldown());
                             TakeDamage(damageValue);
@@ -158,7 +159,7 @@ public class Hydra : Miniboss
                 //If the head is still alive, run its movement/firing cycle.
                 if (hydraHeads[i].GetComponent<EnemyController>().hp > 0)
                 {
-                    StartCoroutine(hydraHeads[i].GetComponent<HydraHead>().ShootAndMove(i));
+                    StartCoroutine(hydraHeads[i].GetComponent<HydraHead>().MovementCycle(i));
                 }
             }
 
@@ -173,9 +174,9 @@ public class Hydra : Miniboss
                 {
                     cooldownTimer += Time.deltaTime;
                 }
-                yield return new WaitForSeconds(0);
+                yield return new WaitForSeconds(Time.deltaTime);
             }
-            yield return new WaitForSeconds(0);
+            yield return new WaitForSeconds(Time.deltaTime);
         }
     }
 
@@ -192,7 +193,7 @@ public class Hydra : Miniboss
                 //If the head is still alive, run its cycle and wait .75 seconds.
                 if (hydraHeads[i].GetComponent<EnemyController>().hp > 0)
                 {
-                    StartCoroutine(hydraHeads[i].GetComponent<HydraHead>().ShootAndMove(i));
+                    StartCoroutine(hydraHeads[i].GetComponent<HydraHead>().MovementCycle(i));
                     //Reset the Cooldown Timer.
                     cooldownTimer = 0;
                     //Wait another .75 seconds before starting the next movement cycle.
@@ -203,7 +204,7 @@ public class Hydra : Miniboss
                         {
                             cooldownTimer += Time.deltaTime;
                         }
-                        yield return new WaitForSeconds(0);
+                        yield return new WaitForSeconds(Time.deltaTime);
                     }
                 }
                 //Otherwise, skip to the next one.

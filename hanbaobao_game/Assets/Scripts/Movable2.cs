@@ -14,7 +14,7 @@ public class Movable2 : MonoBehaviour
 {
     private float speed;            //The speed of the Object, measured in Units per Frame.
     private Vector3 target;         //The target position of the Object (optional).
-    private float angle;            //The angle at which the Object moves (either to reach "target" or to travel a predetermined direction.
+    private float angle;            //The angle (in radians) at which the Object moves (either to reach "target" or to travel in a predetermined direction).
     private Vector3 velocity;       //The X- and Y-distance the Object will move every Frame; made by combining "speed" and "angle".
     public bool moveWithBackground; //Whether this Object moves at the same rate as the main Background layer, to simulate it not moving.
 
@@ -38,6 +38,18 @@ public class Movable2 : MonoBehaviour
     public void SetSpeed(float newSpeed)
     {
         speed = newSpeed;
+    }
+
+    //Return the angle of the Object's direction in radians.
+    public float GetAngleInRadians()
+    {
+        return angle;
+    }
+
+    //Return the angle of the Object's direction in degrees.
+    public float GetAngleInDegrees()
+    {
+        return angle * Mathf.Rad2Deg;
     }
 
     //Set the angle of the Object, independent of a target, using a value in radians.
@@ -76,14 +88,14 @@ public class Movable2 : MonoBehaviour
     public void SetTargetLocal(Vector2 newTarget)
     {
         target.Set(newTarget.x, newTarget.y, transform.localPosition.z);
-        SetAngleInRadians(Mathf.Atan2(target.y - transform.position.y, target.x - transform.position.x));
+        SetAngleInRadians(Mathf.Atan2(target.y - transform.localPosition.y, target.x - transform.localPosition.x));
     }
 
     //Set the target of the Object relative to its Parent using a Vector3.
     public void SetTargetLocal(Vector3 newTarget)
     {
         target.Set(newTarget.x, newTarget.y, transform.localPosition.z);
-        SetAngleInRadians(Mathf.Atan2(target.y - transform.position.y, target.x - transform.position.x));
+        SetAngleInRadians(Mathf.Atan2(target.y - transform.localPosition.y, target.x - transform.localPosition.x));
     }
 
     //Move the Object with the Background, if necessary.

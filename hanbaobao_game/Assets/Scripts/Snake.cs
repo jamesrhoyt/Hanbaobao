@@ -235,7 +235,7 @@ public class Snake : EnemyController
                     if (i == 0)
                     {
                         //If the Body is too far away from the Head, move it.
-                        //Also check if this any movement cycle after the 1st, as all of the parts will move regardless from then on.
+                        //Also check if this is any movement cycle after the 1st, as all of the parts will move regardless from then on.
                         if (Vector2.Distance(transform.position, snakeBody[i].transform.position) >= diameter || moveCycles > 0)
                         {
                             //Update the speed of each Body sphere over time, to match the speed of the Head.

@@ -20,7 +20,7 @@ public class HydraHead : EnemyController
 
     private float diameter;     //The diameter for each object in the Hydra Head.
     private float headLength;   //The length of a Hydra Head, from the center of its head to the center of its last "neck" object.
-    private float angle;        //The new angle (in degrees) that determines the Head's new target.
+    private float movementAngle;//The new angle (in degrees) that determines the Hydra Head's new target.
     private float xDist;        //The magnitude (absolute value) of the horizontal distance between Head base and target.
     private float yDist;        //The magnitude (absolute value) of the vertical distance between Head base and target.
     private float cooldownTimer;//The timer for each of the pauses between the Hydra Head's behavior states.
@@ -30,6 +30,8 @@ public class HydraHead : EnemyController
     private float maxDistance;      //The distance between the Hydra Head's last target position and its current target position.
     private float distPercentage;   //The remaining percentage of distance ("distance" / "maxDistance").
     private float maxSpeed;         //The Head's initial speed when it starts a new movement cycle.
+    private float minSpeed;         //The Head's minimum speed during its movement cycle.
+    private Vector3 step;           //The amount that each Neck object will move this frame (same as "velocity").
 
     //"Flash" Variables:
     private SpriteRenderer hydraRenderer;   //The Sprite Renderer attached to this GameObject.
@@ -47,24 +49,21 @@ public class HydraHead : EnemyController
         hp = 100;
         scoreValue = 1000;
         SetSpeed(0);
-        maxSpeed = 1.4f;
+        maxSpeed = .3f;
+        minSpeed = .01f;
         rateOfFire = 4f;
-        diameter = GetComponent<CircleCollider2D>().radius * 2f * transform.lossyScale.x;
-        headLength = diameter * (hydraSegment.Length - 1);
+        diameter = GetComponent<CircleCollider2D>().radius * 2f * transform.localScale.x/*transform.lossyScale.x*/;
+        headLength = diameter * hydraSegment.Length;
         //Initialize the rest of each head's "Neck" array.
-        for (int i = 1; i < hydraSegment.Length; i++)
+        for (int i = 0; i < hydraSegment.Length; i++)
         {
             //Put each Body object behind the last one on the z-axis, to prevent them from overlapping incorrectly.
-            hydraSegment[i] = Instantiate(hydraNeckTemplate, transform.position + new Vector3(0, 0, i * .02f), Quaternion.identity);
+            hydraSegment[i] = Instantiate(hydraNeckTemplate, transform.position + new Vector3(0, 0, (i + 1) * .02f), Quaternion.identity);
             //Make each part of the Hydra's neck immune to damage; only the head can be damaged directly.
             hydraSegment[i].GetComponent<EnemyController>().dmgImmune = true;
             //Make each part of the Neck a child of the main Hydra object.
             hydraSegment[i].transform.SetParent(transform.parent, true);
         }
-        //hydraSegment[hydraSegment.Length - 1].transform.SetParent(transform.parent, true);
-        //hydraSegment[0].transform.SetParent(hydraSegment[hydraSegment.Length - 1].transform, true);
-        //hydraSegment[1].transform.SetParent(hydraSegment[hydraSegment.Length - 1].transform, true);
-        //hydraSegment[2].transform.SetParent(hydraSegment[hydraSegment.Length - 1].transform, true);
         anchor = hydraSegment[hydraSegment.Length - 1].transform.localPosition;
 
         //Initialize the objects used for the Hydra head's "Hit Flash" effect.
@@ -75,39 +74,32 @@ public class HydraHead : EnemyController
 	}
 
     //Create a new target position for the head via a random function.
-    private void GetNewAngle(int seed)
+    private Vector2 GetNewTarget(int seed)
     {
         Random.InitState(seed);
-        angle = Random.Range(0, 15) * 22.5f;
+        movementAngle = Random.Range(0, 15) * 22.5f;
         //Set the two pythagorean components of the Head's new movement target (the hypotenuse should always be as long as the Head itself).
-        xDist = Mathf.Cos(angle * Mathf.Deg2Rad) * headLength;
-        yDist = Mathf.Sin(angle * Mathf.Deg2Rad) * headLength;
-        //target = new Vector3(hydraSegment[hydraSegment.Length - 1].transform.position.x + xDist, hydraSegment[hydraSegment.Length - 1].transform.position.y + yDist, transform.position.z);
-        SetTarget(new Vector2(anchor.x + xDist, anchor.y + yDist));
-        maxDistance = Vector2.Distance(transform.localPosition, GetTarget());
-        //Update the movement targets of all of the Head's "Neck spheres".
-        for (int i = 1; i < hydraSegment.Length; i++)
-        {
-            hydraSegment[i].GetComponent<HydraNeck>().SetTargetLocal(new Vector2(anchor.x + (xDist * (1.0f - (i/hydraSegment.Length-1))), anchor.y + (yDist * (1.0f - (i / hydraSegment.Length - 1)))));
-        }
+        xDist = Mathf.Cos(movementAngle * Mathf.Deg2Rad) * headLength;
+        yDist = Mathf.Sin(movementAngle * Mathf.Deg2Rad) * headLength;
+        return new Vector2(anchor.x + xDist, anchor.y + yDist);
     }
 
-    //Have the Head fire a shot before picking a new position for it to move to.
-    public IEnumerator ShootAndMove(int index)
+    //Have the Head fire a shot before picking a new position for it to move to, and sending it toward that positon.
+    public IEnumerator MovementCycle(int index)
     {
         //Yield out of this Coroutine to let the others start.
         yield return new WaitForEndOfFrame();
 
         //BULLET FIRING:
-        //Set the target for the laser directly to the left of the Hydra's Head.
-        hydraBullet.GetComponent<Bullet>().SetAngleInDegrees(180f);
-        hydraBullet.GetComponent<Bullet>().SetSpeed(.8f);
         //Create an instance of the Bullet that will appear behind the Hydra's head (on the z-axis).
-        GameObject bullet = Instantiate(hydraBullet, transform.position + new Vector3(-0.02f, 0f, 1f), Quaternion.identity);
+        GameObject bullet = Instantiate(hydraBullet, transform.position + new Vector3(-2f, 0f, 1f), Quaternion.identity);
         //Add the Bullet to the LevelManager's list.
         LevelManager.instance.AddBulletToList(bullet);
+        //Set the laser to travel straight left.
+        bullet.GetComponent<Bullet>().SetAngleInDegrees(180f);
+        bullet.GetComponent<Bullet>().SetSpeed(.8f);
 
-        //HALF-SECOND WAIT:
+        //QUARTER-SECOND WAIT:
         //Reset the Cooldown Timer.
         cooldownTimer = 0;
         //Wait another quarter-second before starting the next movement cycle.
@@ -118,15 +110,82 @@ public class HydraHead : EnemyController
             {
                 cooldownTimer += Time.deltaTime;
             }
-            yield return new WaitForSeconds(0);
+            yield return new WaitForSeconds(Time.deltaTime);
         }
 
         //START NEW MOVEMENT:
-        //Get the Head's new target position
-        GetNewAngle(Time.frameCount * index);
-        //GetNewAngle(LevelManager.instance.shotsFired);
+        //Get the Head's new target position.
+        SetTargetLocal(GetNewTarget(Time.frameCount * (index + 1)));
+        //SetTargetLocal(GetNewTarget(LevelManager.instance.shotsFired));
+        //Set the movement angle for all the Neck objects to the Head's new angle.
+        foreach (GameObject g in hydraSegment)
+        {
+            g.GetComponent<HydraNeck>().SetAngleInDegrees(GetAngleInDegrees());
+        }
+        //Determine the distance between the Head's current position and its next target.
+        maxDistance = Vector2.Distance(transform.localPosition, GetTarget());
         //Reset the head's speed.
         SetSpeed(maxSpeed);
+        
+        //Run this cycle until the Head has reached its target (or is at least close enough).
+        while (Vector2.Distance(transform.localPosition, GetTarget()) >= 2)
+        {
+            //Check the remaining distance between the Hydra head and its new target.
+            distance = Vector2.Distance(transform.localPosition, GetTarget());
+            //Calculate the percentage of distance remaining.
+            distPercentage = distance / maxDistance;
+            //Set the head's speed for this frame.
+            SetSpeed(/*Mathf.Max(*/maxSpeed * distPercentage/*, minSpeed)*/);
+            //Set the distance that each moving object will move this frame.
+            step.Set(Mathf.Cos(GetAngleInRadians()) * GetSpeed(), Mathf.Sin(GetAngleInRadians()) * GetSpeed(), 0);
+
+            //Check the distances between each adjacent part of the Head and Neck, to keep them contiguous.
+            for (int i = 0; i < hydraSegment.Length - 1; i++)
+            {
+                //Check the distance between the Head and 1st Neck sphere.
+                if (i == 0)
+                {
+                    //Check if the 1st Neck sphere is too far away from the Head,
+                    //and that moving won't put the 1st Neck sphere too far from the anchor.
+                    if (Vector2.Distance(transform.localPosition, hydraSegment[0].transform.localPosition) >= diameter
+                    && (Vector2.Distance(hydraSegment[0].transform.localPosition + step, anchor) <= headLength * ((float)(hydraSegment.Length - (i + 1)) / (float)hydraSegment.Length)))
+                    {
+                        //Update the speed of this Neck sphere, provided its link in the chain hasn't reached its limit.
+                        hydraSegment[i].GetComponent<HydraNeck>().SetSpeed(GetSpeed());
+                    }
+                    //Otherwise, stop this Neck sphere.
+                    else
+                    {
+                        hydraSegment[i].GetComponent<HydraNeck>().SetSpeed(0);
+                    }
+                }
+                //Check the distance between the rest of the adjacent Neck spheres (except for the last one).
+                else
+                {
+                    //Check if this Neck sphere is too far away from the one in front of it,
+                    //and that moving won't put this Neck sphere too far from the anchor.
+                    if (Vector2.Distance(hydraSegment[i].transform.localPosition, hydraSegment[i - 1].transform.localPosition) >= diameter
+                    && (Vector2.Distance(hydraSegment[i].transform.localPosition + step, anchor) <= headLength * ((float)(hydraSegment.Length - (i + 1)) / (float)hydraSegment.Length)))
+                    {
+                        //Update the speed of each Neck sphere over time, provided its link in the chain hasn't reached its limit.
+                        hydraSegment[i].GetComponent<HydraNeck>().SetSpeed(GetSpeed());
+                    }
+                    //Otherwise, stop this Neck sphere.
+                    else
+                    {
+                        hydraSegment[i].GetComponent<HydraNeck>().SetSpeed(0);
+                    }
+                }
+            }
+            //Yield out of this Coroutine at the end of every frame.
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        //Once the Head is close enough to its target position, stop all of the objects in place.
+        SetSpeed(0);
+        foreach (GameObject g in hydraSegment)
+        {
+            g.GetComponent<HydraNeck>().SetSpeed(0);
+        }
     }
 
     //Turn the Hydra Head white, and make it invincible, for a very short period of time.
@@ -152,7 +211,7 @@ public class HydraHead : EnemyController
             {
                 damageTimer += Time.deltaTime;
             }
-            yield return new WaitForSeconds(0);
+            yield return new WaitForSeconds(Time.deltaTime);
         }
         //Let the Snake be susceptible to damage again.
         dmgImmune = false;
@@ -167,51 +226,6 @@ public class HydraHead : EnemyController
     // Update is called once per frame
     protected override void Update()
     {
-        //If this head dies, destroy its neck.
-        if (hp <= 0)
-        {
-            for (int i = 1; i < hydraSegment.Length; i++)
-            {
-                hydraSegment[i].GetComponent<EnemyController>().TakeDamage(hydraSegment[i].GetComponent<EnemyController>().hp);
-            }
-        }
-        //Check the remaining distance between the Hydra head and its new target.
-        distance = Vector2.Distance(transform.localPosition, GetTarget());
-        //Calculate the percentage of distance remaining.
-        distPercentage = distance / maxDistance;
-        //Set the head's speed for this frame.
-        SetSpeed(maxSpeed * distPercentage);
-        //If the speed is too low, cap it at .09.
-        /*if (currentSpeed < .09f)
-        {
-            currentSpeed = .09f;
-        }*/
-        //Check the distances between each adjacent part of the Hydra head, to keep them contiguous.
-        for (int i = 1; i < hydraSegment.Length-1; i++)
-        {
-            //If the objects are too far apart, move the next one in line.
-            if (Vector2.Distance(hydraSegment[i].transform.position, hydraSegment[i - 1].transform.position) >= diameter)
-            {
-                //Update the speed of each Neck sphere over time, to match the speed of the Head.
-                hydraSegment[i].GetComponent<HydraNeck>().SetSpeed(GetSpeed());
-            }
-            else
-            {
-                //Update the speed of each Neck sphere over time, to match the speed of the Head.
-                hydraSegment[i].GetComponent<HydraNeck>().SetSpeed(0);
-            }
-        }
-        //If the head has extended its full length, stop all of the objects.
-        if (Vector2.Distance(transform.position, hydraSegment[hydraSegment.Length - 1].transform.position) >= headLength)
-        {
-            //Stop the head (this object).
-            SetSpeed(0);
-            //Stop each of the Neck objects.
-            for (int i = 1; i < hydraSegment.Length; i++)
-            {
-                hydraSegment[i].GetComponent<HydraNeck>().SetSpeed(0);
-            }
-        }
         //Call EnemyController's Update.
         base.Update();
 	}
